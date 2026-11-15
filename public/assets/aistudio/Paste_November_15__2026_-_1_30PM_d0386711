@@ -1,0 +1,954 @@
+FIELD SHIFT — My Farms: Per-Farm and Per-Field Intelligence & Engineering Specification
+Purpose: A build-ready expansion of the My Farms requirements in Field_Shift_Master_Builder_Prompt_v8.md. It defines what the farmer sees, which data the application retrieves, how values are derived, what the backend stores, how recalculations propagate, and where agronomic recommendations must remain qualified or unavailable.
+
+Scope: My Farms portfolio; selected-farm workspace; identical field-level information model for every field; overview; field boundaries; crop and rotation; weather and climate; water and irrigation; soil and land; vegetation and satellite; nutrients and fertilisation; risks and alerts; tasks and observations; field history and reports; farm settings; backend services and acceptance tests.
+
+Scientific and operational rule: No API returns a universally correct field-specific irrigation dose, crop-stage calendar, fertilizer prescription or diagnosis for every crop and location. External services provide particular observations, forecasts, mapped properties or reference data. Field Shift must combine validated data with a versioned crop-knowledge library, farmer-confirmed management records, actual field geometry and transparent scientific calculations. When inputs are missing, show the limitation and do not invent a value.
+0. Non-negotiable rules
+1. Field is the agronomic unit. Every field owns its boundary/version, crop occurrence, planting date, variety, soil profile, irrigation system, management events, water balance, rotation, risks, observations and reports. Farm-level values are clearly labelled roll-ups.
+2. One source of truth. Persist a fact once in its canonical record. Every card, chart, map, alert, report and recommendation reads from that shared record or from a versioned derived result.
+3. Separate fact types. Label values as measured, observed, forecast, reanalysis, satellite-derived, mapped estimate, farmer-reported, modelled, calculated, scenario-only or demonstration data.
+4. No fake completeness. An absent source is Unavailable, Not connected, Not measured, Insufficient data or Stale, not a plausible-looking number.
+5. Keep concepts separate. Crop suitability, crop health, field condition, evidence confidence, data readiness, water deficit, alert severity and recommendation priority are different things.
+6. No silent overwrites. Profile edits create new versions. Reports are immutable snapshots. Derived metrics are marked stale when an input they depend on changes.
+7. No generic prescription. Do not turn a weather value, satellite greenness value or generic crop name directly into a fertilizer, pesticide or irrigation instruction.
+8. Every number is inspectable. Display units, period, method, source, source date, spatial/temporal resolution, uncertainty/quality and calculation version. An information control opens a calculation/evidence drawer.
+9. Recommendations are not actions. Suggested work is not an accepted task; a routine is not proof an event occurred; completing a task does not prove the original risk resolved.
+10. Simple / Advanced is disclosure only. Both modes use identical data, formulas and thresholds. Advanced reveals intermediate values, raw data, source metadata, model versions and assumptions.
+PART A — INFORMATION ARCHITECTURE AND FRONTEND
+1. My Farms portfolio (before opening a farm)
+1.1 Purpose
+The portfolio answers: what farms exist, where are they, how large are their valid mapped fields, which plans are active, what is stale, and where is attention required?
+1.2 Header and controls
+- Persistent global top navigation; no repeated full-width photographic hero on this operational page.
+- Page title My Farms and concise subtitle.
+- Add Farm action.
+- Search across farm name, region, city and field names.
+- Combined filters: status, region/location, active/inactive, alerts, missing data, analysis freshness.
+- Sort by name, mapped area, status, last update or alert count.
+- Table/list toggle where helpful; compact responsive rows on mobile.
+- Clear-filters resets controls only; it must never alter farm data.
+1.3 Portfolio summary
+Show only actual aggregates from saved farms:
+- Number of farms.
+- Number of fields.
+- Total mapped field area, calculated from valid non-overlapping geometries.
+- Number of fields needing attention / active alerts.
+Do not call total area farm area if it is actually the sum of mapped field polygons. Keep declared whole-farm area separate. Do not show a composite health average unless all included components are methodologically comparable and the aggregation, missing-field treatment and coverage are disclosed.
+1.4 Farm table columns
+- Farm identity and genuine farm/map thumbnail if one exists.
+- Location and timezone.
+- Mapped field area and declared farm area (separately labelled when both exist).
+- Field count.
+- Actually selected active crop/rotation plan, or No active plan.
+- Status derived from shared assessment records: Good / Needs attention / Alert / Not assessed.
+- Last successful assessment and freshness.
+- Active alert count.
+- Row action menu: Open, Rename, Edit profile, Manage fields, Open map, Export, Duplicate configuration, Archive, Delete.
+Every action has a real domain handler. Delete requires a consequence-confirmation dialog listing dependent fields, plans, reports, jobs and schedules and accurately explaining local/cloud retention. Archive is not delete. Duplicate configuration must say exactly what is copied; history and reports are not copied unless an explicit supported choice is made.
+1.5 Portfolio states
+- No farms: onboarding and Add Farm.
+- Draft farm: Setup incomplete and resume.
+- Farm without analyses: Analysis not run.
+- Stale report: Needs refresh.
+- Partial sources: Partial with named gaps.
+- Failed save: retain draft, show error and retry.
+- No search matches: show applied filters and clear option.
+- Deleted active farm: route to a remaining farm or empty state and clear invalid context IDs.
+2. Opening a farm — master-detail workspace
+2.1 Layout
+- Breadcrumb: My Farms / [Farm Name].
+- Farm name, general location, mapped area, field count, assessment state, coverage and staleness.
+- Actions: Run Deep Analysis (only when prerequisites are met), Plan Crop Rotations, overflow menu.
+- Desktop contextual rail: approximately 240–260 px, main pane fills the remaining width. Do not squeeze multiple dense columns into a narrow centre.
+- Persistent field selector in the main pane header for every field-scoped route.
+- Mobile: rail becomes an accessible drawer or clearly labelled tab/menu system; field selector remains prominent.
+2.2 Per-farm navigation
+1. Overview / Farm Tracker
+2. Fields & Map
+3. Crop Rotation Plan
+4. Soil & Land
+5. Water Intelligence
+6. Weather & Climate
+7. Vegetation & Field Change (only where a genuine product is connected)
+8. Risks & Actions
+9. Field History / Past Analyses / Reports
+10. Farm Settings
+The farm workspace may keep Journal and Reports as separate destinations or as clearly separated tabs under History, but their records and filters must remain available.
+2.3 Persistent field selector contract
+The field selector is a primary navigation control, not an ordinary metric card. It shows:
+- Field name and stable field ID in technical details.
+- Farm name.
+- Mapped area and geometry version.
+- Boundary completeness/validity.
+- Current crop and variety only when confirmed.
+- Crop stage and planting date only when known or explicitly estimated.
+- Current field status and active alert count.
+- A compact map/field thumbnail if available.
+Switching field updates all field-dependent content together: crop occurrence, crop stage, Kc, weather sampling context, soil properties, water calculations, vegetation raster/date, risks, alerts, actions, journal, reports and active rotation. Keep farm-wide cards labelled as farm-wide while a field is selected. Preserve farmId, fieldId, section, period, rotation ID, crop-occurrence ID and report ID in route/state context.
+2.4 Canonical field context
+A selected field view must reference stable identifiers, not names alone:
+- farmId
+- fieldId
+- geometryVersionId
+- fieldProfileVersionId
+- cropOccurrenceId (when a crop is active)
+- rotationPlanId and active plan version
+- selectedPeriod / timezone
+- reportId where report-focused
+A crop click from a map, calendar or report must open the exact occurrence on the exact field, not whichever field happens to use the same crop name.
+3. Farm Overview / Daily Tracker
+3.1 Main question
+“What is happening on this farm today, which field needs attention, and what is the next useful action?”
+3.2 Content order
+1. Farm identity, location, mapped area, field count, active assessment status, evidence freshness.
+2. Selected-field control, visually prominent.
+3. Current conditions: temperature, high/low, wind, humidity, latest precipitation and timestamp; forecast only when forecast data exists.
+4. Current crop: crop/variety, actual planting date, stage (observed or estimated), season/cycle position and expected maturity window where supportable.
+5. Water status: estimated ETc/demand, observed rain, modelled effective rain, confirmed irrigation, root-zone depletion/status and next irrigation review where valid.
+6. Soil summary: only available key soil properties and source type.
+7. Field map preview positioned in the lower-left area of the overview, showing actual saved geometry on a real map. It is a preview, not a decorative map image. Clicking it opens Maps with the same farm, field and layer/date context.
+8. Active alerts, highest severity first, each linked to evidence and field.
+9. One or more evidence-backed next actions with due windows.
+10. Meaningful changes since last comparable report.
+11. Field table: field name, mapped area, crop, stage, condition, alerts, analysis freshness.
+Do not add unrelated portfolio analytics, decorative activity panels or duplicated metrics just to fill empty space. The overview is a scan surface; full tables and equations belong to their specialist pages.
+3.3 Farm-wide roll-up
+- Show number of fields assessed / total fields.
+- Show count/distribution by status.
+- Show fields with active critical/high issues separately.
+- Aggregate water volumes only from field results on the same time basis and compatible units.
+- Do not allow a healthy large field to hide a critical small field.
+- Do not average unlike indicators (e.g. NDVI, soil pH, mm water deficit, risk severity, confidence) into an undocumented one-number “health score”.
+3.4 “What changed?” logic
+Show only meaningful, comparable changes. Each entry identifies whether it is a new observation, new farmer input, recalculation, revised geometry, source/product change or model-version change. Do not count a mere data retrieval timestamp change as an agronomic improvement or deterioration.
+4. Field Overview — the complete repeated field template
+Every field must have the same detail categories, whether it grows wheat, maize, barley, soybean, a vegetable crop, an orchard crop, is fallow, or has no confirmed crop. Only values and relevant subsections change.
+4.1 Field identity and actions
+Show:
+- Field name, farm and stable field reference.
+- Polygon map and boundary status.
+- Mapped area, perimeter, centroid and area calculation method.
+- Current use: cropped / fallow / cover crop / orchard / pasture / unknown.
+- Current crop and variety only if confirmed.
+- Planting date and date certainty: exact / estimated / unknown.
+- Crop stage: farmer-observed / model-estimated / unavailable.
+- Active rotation plan and version, if any.
+- Last analysis, source freshness and coverage.
+- Actions: View on Map, Edit Boundary, Edit Field Profile, Add Observation, Run Field Analysis (if valid), Open Active Rotation.
+4.2 Field tabs
+- Overview
+- Crop & Growth
+- Soil & Land
+- Water & Irrigation
+- Weather & Climate
+- Vegetation & Satellite
+- Nutrition & Fertilisation
+- Risks & Actions
+- History & Reports
+- Field Settings
+If Navigation uses a shorter set, do not discard the data; use well-labelled subsections or progressive disclosure.
+PART B — DATA ACQUISITION AND SOURCE INTEGRATIONS
+5. Farm/field location and geometry
+5.1 Inputs
+- User-entered farm address or place.
+- Explicit latitude/longitude, optionally geocoded.
+- Optional browser geolocation, only after permission.
+- Independently drawn/imported farm and field polygons.
+- Field geometry version, CRS, source/import method, area, perimeter, validity results and effective date.
+A location pin and field polygon are different entities. A farm may contain many fields; do not save the whole farm as one undifferentiated field polygon.
+5.2 Map and geometry logic
+- Use a real map provider and retain attribution/terms.
+- Support draw, edit vertices, name, delete with confirmation, undo/redo, save/cancel, import and validation.
+- Compute area geodesically or in a suitable equal-area projected CRS; never calculate hectares from raw degrees.
+- Validate self-intersections, duplicate vertices, invalid rings, overlap, implausible size and CRS mismatch. Warn and let the farmer review; do not silently “correct” a boundary.
+- Polygon edits create a new GeometryVersion; previous reports keep the old version.
+- Field geometry drives raster intersections, weather sampling, mapped area and data-coverage calculations.
+5.3 Spatial sampling rule
+Do not assume a point weather API or coarse raster is a true measurement for the whole field. Record source cell size, pixel count, polygon overlap and sample method. Where the provider supports polygon/raster extraction, sample valid intersecting cells and compute a documented area-weighted statistic. Where it only accepts a coordinate, use an explicitly labelled representative point/centroid and disclose the point/grid limitation. For a small field smaller than the source grid, label the output as grid-scale or regional context, not field-specific measurement.
+6. Weather and climate acquisition
+6.1 Coordinate selection
+For each field, query its polygon/centroid and source grid. Store the exact query coordinates or geometry hash, elevation if needed, timezone, returned grid/cell, model and valid time. When the field is large or spans multiple weather cells, use spatial sampling where the provider permits; otherwise disclose a single-point approximation.
+6.2 Forecast API adapter
+A forecast provider such as Open-Meteo can supply current, hourly and daily model values. Candidate variables include:
+- Current/hourly: temperature_2m, relative_humidity_2m, dew_point_2m, precipitation, rain, wind_speed_10m, wind_direction_10m, wind_gusts_10m, shortwave_radiation, vapour_pressure_deficit, et0_fao_evapotranspiration where offered by the selected endpoint/model.
+- Daily: temperature_2m_max, temperature_2m_min, precipitation_sum, precipitation_probability_max, wind_speed_10m_max, wind_gusts_10m_max, wind_direction_10m_dominant, shortwave_radiation_sum, et0_fao_evapotranspiration where supported.
+Example adapter request (verify variable availability and commercial-use terms before production):
+https://api.open-meteo.com/v1/forecast
+  ?latitude={lat}
+  &longitude={lon}
+  &current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m
+  &hourly=temperature_2m,relative_humidity_2m,dew_point_2m,precipitation,rain,wind_speed_10m,wind_direction_10m,wind_gusts_10m,shortwave_radiation,vapour_pressure_deficit,et0_fao_evapotranspiration
+  &daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,shortwave_radiation_sum,et0_fao_evapotranspiration
+  &timezone=auto
+The frontend does not call the provider directly. The backend adapter validates the response, stores provider/model metadata, normalizes units, and returns Field Shift DTOs. Forecast data is always labelled Forecast, with issue/retrieval time and valid time.
+6.3 Historical weather and climate
+Use a historical/reanalysis API (e.g. Open-Meteo Historical Weather, NASA POWER Daily) for daily/hourly historic variables and climate baselines, after choosing a dataset with appropriate spatial and temporal resolution. Reanalysis fills gaps using a model; it is not the same as a local weather-station observation. Keep datasets consistent within long-term comparisons; do not silently splice different models or versions.
+
+NASA POWER Daily is an analysis-ready daily solar/meteorological time series, offers daily average/max/min parameters, and has explicit time-standard behaviour (the daily API defaults to local solar time unless requested otherwise). Set and persist the intended time standard, preferably UTC for internal joins with explicit conversion to farm timezone for presentation. Check original source resolution for every parameter.
+
+Example NASA POWER adapter request (verify parameter IDs, community, unit and returned metadata against the live API before use):
+https://power.larc.nasa.gov/api/temporal/daily/point
+  ?parameters=T2M,T2M_MAX,T2M_MIN,PRECTOTCORR,WS2M,RH2M,ALLSKY_SFC_SW_DWN
+  &community=AG
+  &longitude={lon}
+  &latitude={lat}
+  &start={YYYYMMDD}
+  &end={YYYYMMDD}
+  &format=JSON
+  &time-standard=UTC
+6.4 Weather values shown
+- Current temperature and apparent temperature, if supplied.
+- Daily minimum / maximum / mean temperature.
+- Relative humidity, dew point and VPD when inputs are valid.
+- Wind speed/direction/gusts and measurement height.
+- Rainfall / precipitation amount and hours.
+- Forecast rain probability and predicted amount, separately from actual rainfall.
+- Solar radiation / sunshine.
+- Pressure where relevant.
+- Reference ET₀ with method and source.
+- Heat/cold/frost exposure only against verified crop-specific thresholds and stages.
+- Dry-spell length and rainfall anomaly against a comparable baseline.
+- GDD accumulation and threshold progress.
+6.5 Derived climate metrics
+Daily/period rainfall: sum observations over a precise timezone-aware period; do not sum forecast into observed history.
+
+Rainfall anomaly:
+
+anomaly_mm = observed_period_rain_mm - baseline_period_mean_mm
+
+Also show anomaly percent only when baseline is nonzero and the periods/season definitions match. Store baseline years, dataset, period and method.
+
+Growing degree days:
+
+GDD_day = max(0, (Tmax_capped + Tmin_floored) / 2 - Tbase)
+
+The crop record defines base/upper temperatures, caps/floors and accumulation rule. Sum from a known phenological start date. Record any missing-day fill policy; do not silently fill gaps.
+
+VPD: derive saturation vapour pressure from temperature and actual vapour pressure from humidity/dew point using a cited, unit-checked method; VPD = es - ea. Do not calculate if the input semantics/units are incompatible.
+
+Dry spell: count consecutive days meeting a documented rainfall threshold; threshold is metric-versioned and location/crop use is disclosed.
+
+Heat exposure: compare valid hourly/daily temperatures to crop-specific thresholds for the active crop stage and sensitive period. Store degree-hours/days above threshold only where the model defines them. Do not claim crop damage from exposure alone.
+6.6 Weather API availability states
+Every module has Connected, Stale, Partial, Unavailable or Planned status derived from actual requests. A forecast API failure must not replace the latest successful historical data with zeros or fake forecasts. Record provider, model, query point/grid, unit, period, retrieval time and error class.
+7. Crop knowledge and growth-stage acquisition
+7.1 Critical correction: crop stages are not simply fetched from a universal weather API
+Weather APIs provide weather data. They do not generally know the exact variety, sowing/transplant date, management practice, local stage duration, phenological observations or cultivar response of the user's crop. There is no safe universal endpoint that returns the exact number of days each stage will take for every cultivar and field.
+
+Build a versioned CropKnowledge library backed by reviewed sources (e.g. FAO Irrigation and Drainage Paper 56 crop parameters; crop-specific research/extension data; locally validated variety parameters; official crop calendars where applicable). Where a suitable crop model or crop-data API is integrated, treat it as another sourced parameter provider, not an oracle. Each parameter must retain crop species, cultivar/variety, climate/region applicability, units, source URL/reference, publication/version, uncertainty and validation status.
+7.2 Required crop record
+- Crop ID; common/scientific name; crop family; variety/cultivar.
+- Annual/perennial behaviour; production purpose (grain, forage, vegetable, fruit, etc.).
+- Planting method: direct seed / transplant / perennial establishment / other.
+- Typical planting windows by local agro-climatic zone, if sourced.
+- Minimum/optimum/maximum temperature parameters and relevant stage sensitivities.
+- GDD base and cap/floor values, when a validated thermal-time model exists.
+- Total duration bounds and stage durations or stage GDD thresholds.
+- Stage definitions and stage-transition rules.
+- Kc/Kcb values for initial, development, mid-season and late-season stages; source and climate adjustments.
+- Rooting depth progression by crop stage, not just a single maximum.
+- Root-zone depletion fraction p / MAD guidance where supported.
+- Crop water sensitivity during critical stages.
+- Nutrient uptake curves and crop removal coefficients only where sourced.
+- Crop-specific pH, salinity, drainage and texture tolerances where evidenced.
+- Crop family/host constraints relevant to rotation.
+- Evidence quality and version.
+Unknown parameters remain unknown. Do not create a complete profile merely from a crop name.
+7.3 Crop occurrence record (per field)
+- Field ID and crop occurrence ID.
+- Crop ID and cultivar ID.
+- Actual planting/sowing/transplant date, date certainty and source.
+- Planned date/window separately from actual date.
+- Emergence date, flowering/heading/fruit set dates, maturity/harvest date if observed.
+- Seed rate/plant density if recorded.
+- Irrigation and nutrient program references.
+- Current stage: farmer-observed / sensor-observed / model-estimated.
+- Historical crop sequence and prior crop residue/legume information.
+Never infer that the recommended rotation is already planted. A plan and an actual crop occurrence are different records.
+7.4 Stage estimation pipeline
+1. Read the field's current crop occurrence and exact planting/transplant date.
+2. Read crop species, cultivar and production system.
+3. Load the crop's versioned stage definitions, thermal thresholds and calendar durations.
+4. Fetch daily temperatures for the period since planting from the selected trusted dataset.
+5. Apply crop-specific GDD caps/floors and accumulate GDD.
+6. Compare accumulated GDD with local/cultivar stage transition thresholds, when those exist.
+7. Compare with calendar-duration estimate as a consistency check, not an independent fact.
+8. Incorporate farmer-observed stage/date. A confirmed observation takes precedence for actual stage while modelled stage is retained for comparison.
+9. Estimate flowering, maturity and harvest windows only if parameters and data support it. Propagate uncertainty.
+10. Save the estimated stage with input snapshot, calculation version, confidence and next review trigger.
+If only calendar stage durations exist, use those as a lower-confidence estimate. If actual planting date is missing, display Stage unavailable — confirm planting date; do not calculate precise days remaining.
+7.5 Stage labels
+The four FAO-56 crop-coefficient stages are Initial, Crop development, Mid-season, Late season. They are water-coefficient phases, not a complete universal botanic stage vocabulary. Add crop-specific phenology labels (e.g. emergence, vegetative, flowering, grain filling, maturity) from crop-specific sources. Map detailed phenology stages to Kc/Kcb phases using an explicit crop mapping table.
+PART C — WATER AND IRRIGATION ENGINE (DETAILED)
+8. Water Intelligence: inputs required before computing recommendations
+The backend must assemble all of the following for each field and date/period:
+8.1 Weather inputs
+- Daily/hourly Tmax, Tmin, Tmean.
+- Relative humidity/dew point or actual vapour pressure.
+- Wind speed converted to the required 2 m reference height (u2) using a documented height adjustment when needed.
+- Solar/net radiation inputs.
+- Atmospheric pressure/elevation if required.
+- Observed rainfall, with source/product/time.
+- Forecast rainfall in a separate forecast dataset.
+- ET₀ and its calculation/provider method.
+8.2 Crop inputs
+- Crop/cultivar and crop purpose.
+- Actual planting date and current stage.
+- Stage-specific Kc or Kcb values and their source.
+- Stage duration or thermal thresholds.
+- Rooting depth at current stage.
+- Crop depletion fraction p / MAD parameter.
+- Critical sensitivity windows and stress thresholds.
+- Crop coefficient adjustments for local humidity, wind, crop height and wetting pattern where the FAO method calls for them.
+8.3 Soil and water inputs
+- Field capacity theta_FC and wilting point theta_WP for relevant layers/depths, with source and uncertainty.
+- Soil texture/profile/depth and restrictive layers.
+- Available water capacity where measured or suitably estimated.
+- Current soil moisture/depletion from calibrated in-field sensor if available; sensor location/depth/calibration must be stored.
+- Otherwise, a modelled initial root-zone depletion with an explicit source/assumption and uncertainty.
+- Effective root depth by crop stage.
+- Infiltration/hydraulic conductivity/runoff parameters when the model includes them.
+- Drainage and water-table/capillary-rise context when supported.
+- Irrigation system type, method and measured/declared application efficiency.
+- Irrigation source, reliable supply/capacity and any seasonal cap.
+- Actual irrigation events; keep routine separate.
+8.4 Management and field operations
+- Irrigation date/time and actual applied depth/volume.
+- Irrigation event area and affected zone.
+- Method, pump/sector flow, emitter/nozzle spacing, application rate and pressure/flow evidence where runtime is calculated.
+- Irrigation routine frequency and quantity, each independently confirmed and freshness-dated.
+- Mulch/cover/residue, tillage or other practice only when entered/confirmed and when the selected model accounts for it.
+If required inputs are missing, calculate only the outputs that remain scientifically supportable. Example: ET₀/ETc can be estimated without a soil profile, but exact field irrigation timing/root-zone depletion cannot.
+9. Reference evapotranspiration ET₀
+9.1 Primary method
+Use FAO-56 Penman–Monteith when all required meteorological inputs are available and validated. Daily form:
+ET0 = [0.408 * Delta * (Rn - G)
+       + gamma * (900 / (T + 273)) * u2 * (es - ea)]
+      / [Delta + gamma * (1 + 0.34 * u2)]
+Where:
+- ET0: reference evapotranspiration, mm/day.
+- Rn: net radiation at crop surface, MJ/m²/day.
+- G: soil heat flux, MJ/m²/day (daily approximation may be zero only where method permits and is stated).
+- T: mean daily air temperature at 2 m, °C.
+- u2: wind speed at 2 m, m/s.
+- es: saturation vapour pressure, kPa.
+- ea: actual vapour pressure, kPa.
+- Delta: slope of saturation vapour pressure curve, kPa/°C.
+- gamma: psychrometric constant, kPa/°C.
+Implement every intermediate calculation with unit conversions and validation. Record method version, input variables, time standard and missing-data policy.
+9.2 ET₀ provider alternative
+If a provider returns a documented FAO reference ET₀ variable (for example Open-Meteo's et0_fao_evapotranspiration), the service may use it as provider-supplied ET₀ after checking model, definition, units, time-step, licence and missing values. Store provider provenance and do not claim Field Shift independently ran Penman–Monteith unless it did.
+9.3 Incomplete weather data
+If wind/radiation/humidity is missing, do not label a temperature-only or incomplete-data proxy FAO-56. Either use a scientifically documented alternative method with explicit name/limitations or show ET₀ unavailable. Do not quietly invent missing weather inputs.
+10. Crop evapotranspiration ETc and crop stage
+10.1 Single crop coefficient method
+For standard, well-watered crop conditions:
+
+ETc = Kc * ET0
+
+Kc is selected/interpolated from the field crop occurrence's stage-specific curve. It must not be a single generic coefficient for the whole crop season.
+
+The service:
+1. Determines stage from planting date + phenology/GDD + observed stage.
+2. Loads Kc_ini, Kc_mid, Kc_end and stage durations from the versioned crop knowledge base.
+3. Builds an interpolation curve through initial → development → mid-season → late-season.
+4. Adjusts coefficients for relevant climate, wind, humidity, crop height and wetting frequency using the documented method where required.
+5. Multiplies the correct period's ET₀ by Kc.
+6. Stores the exact curve point, ET₀ and Kc used.
+10.2 Dual crop coefficient for daily irrigation management
+Where the input data supports daily soil evaporation, use:
+
+ETc = (Kcb + Ke) * ET0
+
+Under water stress:
+
+ETc_adj = (Ks * Kcb + Ke) * ET0
+
+Where Kcb represents basal crop transpiration, Ke represents soil evaporation, and Ks reduces transpiration under root-zone stress. This is generally more physically informative for daily scheduling than applying a stress coefficient indiscriminately to soil evaporation.
+
+Ke requires soil-surface wetting/depletion, exposed/wetted soil fraction, rainfall/irrigation events and evaporation-layer data. If these are absent, use the supported single-Kc method and disclose its limitation.
+10.3 Crop water demand display
+Show:
+- ET₀ (mm/day) and method/source.
+- Crop and crop occurrence.
+- Current stage and how determined.
+- Kc/Kcb and source/version.
+- Ke and Ks when calculated.
+- Potential ETc (no water stress) and adjusted ETc (stress adjusted) separately.
+- Daily demand and cumulative demand for selected period.
+- Field volume equivalent: m³ = ETc_mm * area_ha * 10.
+- Confidence and missing inputs.
+ETc is crop evapotranspiration, not automatically the exact amount the irrigation system should apply that day. Irrigation scheduling must also consider stored soil water, effective rainfall, application efficiency and root-zone limits.
+11. Rainfall, effective precipitation and source reconciliation
+11.1 Store separate rainfall concepts
+- Observed station rainfall.
+- Gridded/reanalysis rainfall.
+- Satellite precipitation product (e.g. GPM IMERG) with run type/version/latency.
+- Forecast rainfall.
+- Modelled effective rainfall / infiltrated rainfall.
+Never combine them into one unlabeled rainfall number.
+11.2 Fetch and aggregation
+Fetch daily/half-hourly/hourly precipitation at the field's valid source grid or available coordinate. Aggregate only the requested local-day/week/month/season windows, with timezone and accumulation semantics preserved. Convert all inputs to mm before calculation. Track whether each datum is instantaneous, interval accumulation or daily sum.
+11.3 Cross-checking
+A GPM IMERG cross-check can be useful, but product grids and latency differ. Do not blindly average conflicting datasets. Keep one documented primary rainfall source for each calculation, show material discrepancies and QC flags, and preserve the source snapshot used by prior reports.
+11.4 Effective rainfall
+Do not use a universal fixed percentage of rainfall as effective rain. Model the part entering and remaining in the root zone using supported infiltration/runoff/storage/drainage logic. In a daily root-zone depletion balance, use the actual terms (P - RO) and DP; do not subtract a separate P_effective and also subtract runoff/percolation again (that would double count losses).
+
+If field infiltration/runoff parameters are missing, label effective rainfall as uncertain/modelled and lower confidence. If only observed rainfall is available, show the observed depth and do not pretend its effective fraction is exact.
+12. Daily root-zone soil-water balance
+12.1 Soil water availability
+For a uniform root-zone layer:
+
+TAW = 1000 * (theta_FC - theta_WP) * Zr
+- TAW: total available root-zone water, mm.
+- theta_FC: volumetric water content at field capacity, m³/m³.
+- theta_WP: volumetric water content at wilting point, m³/m³.
+- Zr: effective root-zone depth, m.
+For layered soils, calculate layer-specific available water and the portion accessible to active roots; do not use one uniform value if the profile is materially layered.
+
+RAW = p * TAW
+
+p is crop- and demand-dependent depletion fraction. Use crop-specific parameters and adjust as the selected FAO method requires for ETc conditions. Do not take one generic p for every crop/stage/soil.
+12.2 Daily root-zone depletion equation
+FAO-style depletion balance:
+
+Dr_i = Dr_(i-1) - (P_i - RO_i) - I_i - CR_i + ETc_adj_i + DP_i
+- Dr_i: root-zone depletion at end of day i, mm.
+- P_i: daily precipitation, mm.
+- RO_i: runoff, mm.
+- I_i: net irrigation that infiltrates the soil, mm.
+- CR_i: capillary rise into root zone, mm (only when supported; otherwise explicitly assume zero).
+- ETc_adj_i: water lost through crop ET under the modeled water-stress condition, mm.
+- DP_i: deep percolation out of root zone, mm.
+Constrain depletion to 0 <= Dr <= TAW. Water added beyond field-capacity storage is accounted as drainage/percolation, not retained indefinitely.
+12.3 Initial state
+Prefer measured/calibrated soil moisture at relevant root depths:
+
+Dr_initial = 1000 * (theta_FC - theta_current) * Zr
+
+For a layered profile, compute by layer and root fraction. If only a coarse satellite/model estimate is available, use it as a modelled initial state with depth/resolution caveat. If no moisture measure/model exists, initialize from a stated prior (e.g. last confirmed irrigation/rain event and soil-water model), propagate uncertainty and do not claim exact irrigation timing.
+12.4 Water stress coefficient
+While Dr <= RAW, Ks = 1.
+
+When Dr > RAW, an FAO-56 depletion-based stress coefficient is:
+
+Ks = (TAW - Dr) / (TAW - RAW)
+
+Constrain Ks to [0,1]. Use the correct single/dual Kc stress adjustment described above. A modelled stress indicator is not a field diagnosis; show its assumptions and confidence.
+12.5 Outputs
+- Current root-zone depletion Dr (mm).
+- TAW, RAW and crop p.
+- Fraction of available water depleted.
+- Estimated root-zone moisture, depth and source.
+- Water stress coefficient Ks, if valid.
+- Potential and stress-adjusted ETc.
+- Daily balance table: ET₀, Kc/Kcb, Ke, ETc, observed rain, runoff estimate, irrigation event, capillary rise, drainage/percolation, start/end depletion, Ks.
+- 7/14/30-day forecast scenario separately, clearly marked as forecast-driven projection, not observed fact.
+13. Irrigation scheduling — when, how much, how many events and how long
+13.1 The engine must not invent a fixed schedule
+Do not tell every farmer to irrigate every five hours, every three days or at a fixed time. Interval, dose, pulse count and run duration depend on root-zone depletion, crop stage, soil storage/infiltration, irrigation method/capacity, system uniformity, weather forecast, water availability, and management constraints.
+13.2 Irrigation trigger
+- Define target allowable depletion MAD/scheduling threshold from crop sensitivity, stage, soil uncertainty and farmer/management preference.
+- Use RAW = p * TAW as a biophysical no-stress threshold; management may set a more conservative allowable depletion where justified.
+- Forecast depletion forward with ETc and expected rainfall as a separate projected scenario.
+- Recommend an irrigation window before/when predicted depletion reaches the chosen threshold, not merely because the daily ETc is positive.
+- Sensitive stages may justify a stricter threshold only when crop-specific parameters support it.
+- If the actual root-zone state is not known well enough, the result is Irrigation review suggested rather than an exact automated dose.
+13.3 Net irrigation depth
+At a scheduling event, calculate net refill depth based on the desired target depletion:
+
+I_net_mm <= Dr_current - Dr_target
+
+The upper limit is constrained by root-zone storage to field capacity, infiltration capacity, and avoidance of deep percolation. Do not recommend more water than the modeled deficit can store. If leaching for salinity is considered, it requires a separate valid salinity/leaching model and water quality data.
+13.4 Gross irrigation depth
+If application efficiency Ea is a measured/defensible fraction:
+
+I_gross_mm = I_net_mm / Ea
+
+State whether Ea includes conveyance losses, field application losses or both. Do not use an unverified default as if measured.
+13.5 Convert to water volume
+For field area in hectares:
+
+Volume_m3 = I_gross_mm * Area_ha * 10
+
+Because 1 mm over 1 ha = 10 m³. Display net and gross depth, field volume, source availability and any water cap separately.
+13.6 Calculate system application rate and runtime
+Required hardware/operation data:
+- Irrigation system: drip / sprinkler / centre pivot / surface / other.
+- Field/zone area actually irrigated.
+- Pump/zone flow rate in m³/hour or L/hour.
+- Emitter/nozzle count, discharge rate and spacing where relevant.
+- Lateral/row spacing.
+- Operating pressure and pressure variation.
+- Distribution/uniformity coefficient if measured.
+- System efficiency and application rate.
+- Maximum allowed run time, pump schedule and water availability.
+If measured zone flow Q_m3h and area A_ha are known:
+
+Application_rate_mm_h = Q_m3h / (10 * A_ha)
+
+Runtime_h = I_gross_mm / Application_rate_mm_h
+
+Equivalent:
+
+Runtime_h = Required_volume_m3 / Zone_flow_m3h
+
+For emitter-based estimates, compute total discharge from emitter flow and the number of operating emitters, accounting for row/lateral/emitter spacing and actual irrigated area. Do not infer runtime from a farmer's two hours routine unless flow is known; duration alone does not determine volume.
+13.7 How many irrigations per day / pulse scheduling
+Choose number and duration of events from:
+1. Target net depth and gross depth.
+2. System flow and application rate.
+3. Soil intake/infiltration rate and surface storage.
+4. Root-zone storage and wetting pattern.
+5. Runoff/ponding risk.
+6. Crop rooting and sensitivity.
+7. Emitter wetting bulb and system uniformity for drip.
+8. Wind/evaporation constraints for sprinkler systems.
+9. Power/water supply and operational limits.
+If the system's application rate exceeds the soil's intake/storage capacity, or field slope/soil crusting creates runoff risk, the schedule may split into cycles with soak intervals. Calculate cycle count and duration from a validated field infiltration/system model or measured irrigation audit. Do not prescribe every 5 hours without those inputs. For drip, small frequent irrigation may be appropriate in some coarse soils and crops, but exact frequency requires soil/root-zone and emitter data.
+13.8 Irrigation timing of day
+Choose an operational window based on water availability, energy constraints, system rules, weather and crop-management practice. Avoid universal claims that one clock time is always scientifically optimal. For sprinkler irrigation, wind drift/evaporation conditions can matter; for drip, evaporative timing is less directly important but soil/water scheduling still governs. Use farm timezone and forecast wind/heat as scheduling context.
+13.9 Irrigation result shown to farmer
+The recommendation drawer must state:
+- Field and crop/stage.
+- Why now — current depletion, RAW/MAD threshold and expected depletion trajectory.
+- Recommended net depth and gross depth.
+- Estimated total volume (m³) and area basis.
+- Method and efficiency assumption.
+- Zone flow/application rate.
+- Estimated run duration and number of cycles only if hardware/infiltration data are known.
+- Rainfall forecast considered (separately, with probability and time window).
+- Water supply/cap constraints.
+- Expected post-irrigation depletion/storage.
+- Risks of over-irrigation/leaching/runoff.
+- Confidence, missing inputs and source/method version.
+- Record as planned versus Record irrigation completed (distinct actions).
+Never automatically record a recommendation as actual irrigation.
+PART D — SOIL, NUTRIENTS AND FERTILISATION
+14. Soil & Land page
+14.1 Properties to display when genuinely available
+- Sand, silt, clay fractions and textural class.
+- pH.
+- Organic carbon and organic matter (stored separately with conversion method if one is derived).
+- Bulk density and coarse fragments.
+- Cation exchange capacity (CEC).
+- Total/mineral nitrogen where source supports it.
+- Available phosphorus and potassium with extraction method.
+- Secondary/micronutrient test results when available.
+- Electrical conductivity (EC)/salinity and test method.
+- Field capacity, wilting point and available water capacity where supported.
+- Drainage classification, waterlogging history.
+- Slope/elevation/terrain.
+- Soil moisture by depth/time/product.
+- Laboratory sample ID, date, depth, lab/method and farmer/source.
+14.2 Structured measurement table
+Columns: property, value, unit, depth, evidence type, source/product/lab, sample/observation date, retrieval date, spatial resolution, uncertainty/range, confidence, What it means, status. Keep lab sample separate from gridded predictions. If mapped estimate and newer laboratory result conflict, show both and apply a documented precedence rule; never overwrite the laboratory record.
+14.3 Soil texture and derived parameters
+- Texture fractions should sum to approximately 100% within a documented rounding tolerance.
+- Classify with a declared system (e.g. USDA texture triangle); do not mix systems silently.
+- Do not derive actual salinity, measured nutrient deficiency, drainage failure or exact available water capacity from unrelated soil properties.
+- Pedotransfer estimates of field capacity/wilting point may only be used if a named, validated function and all required inputs exist; label estimated and carry uncertainty.
+14.4 Soil data provider status
+Potential source: SoilGrids mapped soil predictions at 250 m and standard depth intervals, with uncertainty. These are regional gridded predictions, not lab data from the selected field. As of 15 November 2026, the official ISRIC SoilGrids page reports REST API service issues and a temporary pause; do not build a live green connected status around that REST endpoint until service availability is rechecked. Use farmer lab data, verified local/national soil providers or an approved cached/download workflow as available. If no reliable source exists, show Not available and offer Add measurement.
+14.5 Terrain
+Use a verified elevation/DEM source and record resolution, projection and vertical datum. Slope is derived from elevation with a documented algorithm and correct horizontal/vertical units. Terrain can inform runoff/erosion susceptibility; it alone does not prove waterlogging, soil loss or drainage failure.
+15. Nutrient intelligence and fertilizer calculations
+15.1 No generic fertilizer-dose API
+Weather APIs do not prescribe fertilizer rates. Crop databases may provide nutrient demand/uptake curves, but actual field recommendations require soil tests (with extraction method/depth), crop/cultivar and stage, attainable target yield, prior crops/residues, manure/compost, irrigation-water nutrients, fertilizer history, local calibration and fertilizer-product composition. A global crop name plus weather is not enough to generate a safe N/P/K prescription.
+15.2 Inputs needed per field
+- Crop and cultivar; crop stage; planting date.
+- Crop nutrient uptake curve or nutrient requirement per unit of attainable yield, with source and uncertainty.
+- Target yield and its basis/source; actual historical yields if confirmed.
+- Soil-test N/P/K, sample date/depth, extraction method, lab and units.
+- Organic matter/mineralization context only where the selected model supports it.
+- Previous crop, residues, cover crops and validated legume N credit if relevant.
+- Manure/compost type, nutrient analysis, rate, date and expected availability.
+- Irrigation-water nutrient analysis where relevant.
+- Fertilizer product grade/composition, nutrient form, application method, timing and prior amount.
+- Local calibrated recommendations, regulatory limits, environmental restrictions and application rules.
+- Expected nutrient-use/recovery efficiency and its source/method.
+15.3 Nutrient budget logic
+Calculate each nutrient separately (N, P, K and any secondary/micronutrients). Use a locally calibrated agronomic method. A general bookkeeping framework is:
+
+Nutrient_gap = crop_nutrient_requirement - soil_supply - available_residue_credit - available_manure_credit - water_supply_credit - other_supported_credits
+
+Then, where a validated recovery-efficiency calculation is available:
+
+Fertilizer_nutrient_rate = max(0, Nutrient_gap) / expected_fertilizer_recovery_fraction
+
+This is a framework, not a universal prescription formula. Soil-test calibration curves, nutrient availability transformations, fixation/mineralization and response functions must be specific to crop, soil, region and nutrient. Do not double-count total soil nutrient stock as immediately plant-available supply.
+
+For N, estimate soil supply and crop demand with locally validated methods; omission-plot or calibrated regional recommendations may be necessary. For P and K, incorporate soil-test calibration and crop removal/uptake and residual nutrient credits. Crop uptake per tonne of yield is not automatically equal to fertilizer rate.
+15.4 Fertilizer material amount
+If a validated nutrient application target is known and product label grade gives nutrient fraction:
+
+Product_kg_per_ha = required_nutrient_kg_per_ha / nutrient_mass_fraction
+
+Total_product_kg = Product_kg_per_ha * field_area_ha
+
+For example, 46% N product has a nitrogen mass fraction of 0.46. The application schedule must split the validated seasonal requirement according to crop uptake/stage, local agronomic guidance, nutrient mobility, soil texture, irrigation method and loss risk. The UI must show elemental nutrient basis versus oxide basis (e.g. P vs P2O5, K vs K2O) explicitly and convert only with documented factors.
+15.5 Timing / split applications
+- Load crop-stage nutrient uptake and critical demand windows from the crop knowledge base.
+- Compare current crop stage and actual date to those windows.
+- Consider nutrient mobility, leaching/volatilization/runoff risk, soil moisture and weather forecast.
+- Split nutrients when crop-specific/local guidance supports it; do not universally split all products the same way.
+- Use prior applications, residues and manure credits to prevent duplicate recommendation.
+- Fertigation requires a compatible irrigation system, product solubility/compatibility and controlled injector/calibration. Warn about contamination risk and distribution uniformity.
+- Foliar applications require crop/product-specific safety, concentration and compatibility support; do not infer a safe spray concentration from nutrient deficit.
+15.6 Fertilizer record and UI
+Show plan vs actual separately:
+- Nutrient / product / grade.
+- Calculated nutrient requirement and product amount.
+- Rate per hectare and total field quantity.
+- Planned split events by date/stage.
+- Method (broadcast, band/placement, fertigation, foliar) and method constraints.
+- Source, lab test, yield target, crop uptake model and efficiency assumption.
+- Farmer-confirmed application event, date, quantity and evidence.
+- Nutrient balance and historical applications.
+- Environmental cautions and local regulatory warnings.
+Do not generate a fertilizer recommendation if soil/crop inputs are inadequate. Show Need a current soil test or Needs local agronomic calibration instead. Do not give an exact nutrient rate based only on satellite greenness.
+PART E — VEGETATION, CROP PROTECTION AND RISK
+16. Satellite and vegetation intelligence
+16.1 Sources and acquisition
+Potential products include Sentinel-2 surface reflectance, MODIS vegetation indices and Harmonized Landsat/Sentinel products, but only after the precise product, access method, licence, band definition, quality mask, pixel size and composite period are implemented. Sentinel-2 MSI has 13 bands; visible/NIR bands include 10 m products, while red-edge/SWIR bands have 20 m resolution and atmospheric bands 60 m. This scale must be displayed; a field smaller than a pixel cannot produce fine field diagnostics.
+16.2 NDVI
+NDVI = (NIR - Red) / (NIR + Red)
+
+For Sentinel-2, the red and NIR reflectance bands (typically B4 and B8) are used with the relevant reflectance scaling and quality masking. Apply cloud, cloud-shadow, cirrus and no-data masking using product QA/classification. Check reflectance scaling and divide-by-zero/missing conditions.
+16.3 Field extraction
+For each image/composite:
+1. Load valid surface reflectance product.
+2. Apply QA/cloud/shadow masks.
+3. Intersect valid pixels with the selected field geometry version.
+4. Calculate polygon-weighted mean/median and distribution only over valid pixels.
+5. Count valid/invalid pixels and report valid coverage percentage.
+6. Store acquisition date, composite window, pixel size, product version, mask, algorithm and geometry version.
+7. Compare only compatible products, crop stages and seasonal baselines.
+Display NDVI/EVI name, value/scale, date, source, pixel size, valid-pixel count, coverage, cloud quality, aggregate method, trend/baseline and uncertainty. NDVI signals spectral vegetation change; it does not prove disease, nitrogen deficiency or yield loss.
+16.4 Time series and change detection
+Delta_NDVI = current_valid_NDVI - previous_comparable_NDVI
+
+Display actual time-series samples, not interpolated fake data. Require enough valid observations and coverage. Stage-aware baselines require crop identity/stage and compatible reference data. If source/product/season/geometry differs, label Not directly comparable.
+17. Crop-protection risks and environmental risk
+17.1 Potential risk domains
+- Water stress / depletion.
+- Heat exposure during sensitive stage.
+- Cold/frost exposure where relevant.
+- Dry spell / rainfall deficit.
+- Salinity risk (requires soil/water EC and crop tolerance).
+- Potential runoff/erosion susceptibility.
+- Nutrient deficiency/excess only from valid test/model evidence.
+- Crop growth delay or stage deviation.
+- Vegetation decline (not a diagnosis).
+- Pest/disease risk only where crop-pathogen/host relationships and a validated risk model/scouting evidence exist.
+- Irrigation system malfunction only from actual operation/sensor/user evidence.
+- Rotation constraints and crop-family repetition.
+17.2 Risk record
+Each risk stores: rule/model ID and version; field/crop occurrence; severity; confidence; onset/last-seen; evidence IDs; source timestamps; thresholds; calculation; plausible mechanism; competing explanations; mitigation/monitoring action; and status history.
+
+Severity and confidence are independent. High severity / low confidence means the possible consequence is serious but evidence is weak; it does not become a confirmed diagnosis.
+17.3 Example rules
+- Water stress: valid root-zone balance shows depletion reaching/exceeding crop-specific RAW/MAD threshold.
+- Heat exposure: validated crop-stage-specific temperature-duration threshold exceeded.
+- Rainfall deficit: comparable season-period rainfall below its local historical baseline by documented threshold.
+- Vegetation change: quality-screened comparable time series has statistically/operationally meaningful reduction.
+- Soil-data gap: required soil variable absent for a requested model.
+- Rotation review: review date reached or material profile/crop history change invalidates suitability.
+17.4 Pest and disease warning
+Weather factors (temperature, humidity, leaf wetness, rainfall, wind) may contribute to a pathogen risk model only when species/variety, pathogen, local epidemiological parameters, phenological stage and model validation are known. A humidity spike or NDVI decline alone cannot diagnose a disease. A model alert says Risk conditions favourable for ... and gives its source/rule; confirmation requires scouting/lab/qualified agronomic diagnosis as applicable. No generic pesticide dose or spray interval may be generated from the climate API alone.
+17.5 Alert lifecycle
+New → Active → Acknowledged → Resolved; optional Snoozed/Dismissed states have separate semantics. Dismissed is not corrected. Deduplicate the same unresolved cause; retain first/last seen and all status changes. A task completion does not auto-resolve an alert; later evidence must verify it.
+18. Field actions, observations and operational records
+18.1 Records supported per field
+- Irrigation events.
+- Fertilizer/nutrient events.
+- Planting/transplant/sowing events.
+- Harvest events and actual yield/quality.
+- Tillage, residue, cover crop and amendment events.
+- Scouting observations and photos.
+- Pest/disease observations.
+- Soil sampling/laboratory results.
+- Machinery/irrigation-system maintenance.
+- Tasks and recommendations.
+Each record includes field, date/time/timezone, event type, quantity/unit/area where relevant, author, source type, original user statement, attachments, confirmation state and edit history.
+18.2 Routine vs event
+A saved recurring routine describes what usually happens. An event describes what actually happened on a particular date. Never generate actual irrigation/fertilizer/planting events from a routine. If the routine is old, show Needs confirmation and disclose the affected calculation.
+18.3 Tasks
+Task states: Suggested, Accepted, Scheduled, In progress, Completed, Deferred, Dismissed. Task payload includes title, reason, field/crop stage, due window, priority, source evidence, prerequisites, notes, actor, completion timestamp and any linked alert/report. The due date is an estimate if based on a model; label it accordingly.
+19. Crop yield, harvest and productivity
+- Store actual harvested quantity, harvest area, unit, moisture basis/standardization when relevant, crop/variety, field, harvest date, grade/quality, source and farmer confirmation.
+- Compute yield only as harvested quantity / harvested area after checking compatible area and unit basis.
+- Store multiple harvests/cuttings separately for forage/perennial crops.
+- Yield projections require an explicitly named validated model with crop, cultivar, weather, soil, water, planting/stage, management and historical calibration inputs. Do not infer a precise yield solely from NDVI or a generic health score.
+- Compare yield by compatible crop, unit, season, moisture basis, cultivar and area basis. Distinguish observed yield from modelled forecast.
+PART F — FIELD HISTORY, REPORTS, SETTINGS
+20. Field History / Journal
+Chronological events:
+- Boundary/profile changes.
+- Planting/emergence/flowering/harvest.
+- Irrigation and fertilizer events.
+- Tillage/residue/cover crop actions.
+- Scouting/observations and photos.
+- Weather/forecast data arrivals (only material updates, not every poll).
+- Satellite observation arrivals.
+- Risk/alert detection, acknowledgement and resolution.
+- Tasks and outcomes.
+- Rotation selection/rejection/defer/replacement.
+- Analyses and reports.
+Each event labels origin (farmer, sensor, external source, satellite, calculated, AI-interpreted). AI must not appear as farmer-authored. Filters include date, event type, field, crop occurrence and origin. Clicking opens the immutable event/evidence snapshot.
+21. Past analyses and reports
+Every report is an immutable snapshot of:
+- Farm/field/geometry/profile/practice/crop/rotation versions.
+- Scope and run trigger (manual/scheduled/recompute).
+- Source/product variables and time windows.
+- Raw/normalized data references and quality flags.
+- Calculation engine, model and crop-library versions.
+- Metric definitions, formulas, values, units and confidence.
+- Per-field results and farm roll-up/coverage.
+- Findings, risks, actions, data gaps and limitations.
+- Job stages, partial source failures, timestamps and run ID.
+Report table includes date/time, scope, trigger, complete/partial/failed, coverage, field status and Open action. Comparison requires selecting two immutable reports. It flags Comparable, Partially comparable or Not comparable. Separate true environmental changes from changed user inputs, geometry, source/product, model version and coverage changes. A failed new run never replaces the last successful report.
+22. Farm Settings
+- Farm name, description, location, timezone, units.
+- Field list, field names, boundaries, area and profile completeness.
+- Privacy/sharing and permissions.
+- Irrigation/water-source defaults; inheritance to fields requires explicit farmer confirmation.
+- Crop preferences, management practices and constraints.
+- Data-source permission and refresh settings.
+- Export farm/field records and reports.
+- Run/refresh analysis only when valid; manage schedule/automation where backend queue exists.
+- Archive and delete with separate consequence confirmations.
+Input changes create a profile version and invalidate only dependent calculations. Historical reports are not rewritten.
+PART G — BACKEND DESIGN AND DATA CONTRACTS
+23. Canonical records
+Minimum entities:
+- Farm, FarmProfileVersion
+- Field, GeometryVersion, FieldProfileVersion
+- FarmPractice, FieldPractice
+- CropKnowledgeVersion, CropOccurrence, CropStageObservation, CropHistoryEvent
+- SoilProfile, SoilMeasurement
+- DataSource, DataObservation, DataQualityResult
+- WeatherObservation, WeatherForecast
+- IrrigationRoutine, IrrigationEvent
+- WaterBalanceRun, WaterBalanceDay, IrrigationRecommendation
+- NutrientPlan, FertilizerEvent, NutrientBalance
+- SatelliteScene, RasterObservation, VegetationMetric
+- RiskAssessment, Alert, AlertEvent
+- ActionTask, ObservationJournalEntry, ManagementEvent
+- RotationPlan, RotationPlanVersion, PlanDecisionEvent
+- AnalysisInputSnapshot, AnalysisRun, DeepAnalysisReport, DerivedMetric
+- Schedule, Job, AuditEvent
+Every time series/derived metric has field ID, period, unit, source/model, version, input references and availability state.
+24. Recommended service boundaries
+- FarmRepository: farm/field CRUD, profile versioning, geometry.
+- WeatherProvider: current, forecast, history/reanalysis.
+- CropKnowledgeService: sourced crop parameters, phenology, Kc, root-depth, stage and nutrient traits.
+- SoilProvider: field/lab and mapped soil properties.
+- EarthObservationProvider: satellite scene search, raster retrieval and quality flags.
+- DataQualityService: schema, units, ranges, time semantics, QC and coverage.
+- AgronomicEngine: pure deterministic crop, ET, water, soil, nutrient and risk calculations.
+- IrrigationScheduler: trigger, depth, volume, runtime and cycle calculation from supported system inputs.
+- NutrientEngine: calibrated nutrient budget and product conversion; no prescription if prerequisites missing.
+- AnalysisOrchestrator: analysis stages, job status, retry, cancellation and idempotency.
+- AlertService: rules, deduplication and lifecycle.
+- TaskService: task creation and status.
+- ReportService: immutable snapshots and comparisons.
+- AuditService: actor/event records.
+25. Suggested REST API contract
+GET    /api/farms
+POST   /api/farms
+GET    /api/farms/:farmId
+PATCH  /api/farms/:farmId
+POST   /api/farms/:farmId/archive
+DELETE /api/farms/:farmId
+
+GET    /api/farms/:farmId/fields
+POST   /api/farms/:farmId/fields
+GET    /api/fields/:fieldId
+PATCH  /api/fields/:fieldId
+POST   /api/fields/:fieldId/geometry-versions
+GET    /api/fields/:fieldId/geometry-versions
+
+GET    /api/fields/:fieldId/crop-occurrences
+POST   /api/fields/:fieldId/crop-occurrences
+PATCH  /api/crop-occurrences/:cropOccurrenceId
+GET    /api/crop-occurrences/:cropOccurrenceId/stage
+
+GET    /api/fields/:fieldId/weather?period=...
+GET    /api/fields/:fieldId/soil
+GET    /api/fields/:fieldId/water-balance?period=...
+POST   /api/fields/:fieldId/water-balance/recalculate
+POST   /api/fields/:fieldId/irrigation-events
+POST   /api/fields/:fieldId/irrigation-recommendations/preview
+
+GET    /api/fields/:fieldId/nutrients
+POST   /api/fields/:fieldId/nutrient-plans/preview
+POST   /api/fields/:fieldId/fertilizer-events
+
+GET    /api/fields/:fieldId/vegetation?period=...
+GET    /api/fields/:fieldId/risks
+GET    /api/fields/:fieldId/alerts
+GET    /api/fields/:fieldId/tasks
+GET    /api/fields/:fieldId/history
+GET    /api/fields/:fieldId/reports
+
+POST   /api/farms/:farmId/deep-analysis
+GET    /api/farms/:farmId/analysis-runs/:runId
+GET    /api/farms/:farmId/reports
+GET    /api/reports/:reportId
+POST   /api/reports/compare
+All routes authenticate and authorize against workspace membership and farm/field ownership. Validate every request/response DTO. Use stable IDs, idempotency keys for job/event creation, bounded retries, request timeouts and standard error codes. Never expose API secrets in browser code.
+26. Recalculation dependency graph
+Examples:
+- Change planting date → crop stage/GDD/date forecast → Kc/Kcb selection → ETc → water balance → irrigation trigger → heat/crop-stage risk → calendar dates → affected report stale.
+- Change crop variety → phenology thresholds, Kc, root-depth, nutrient curves, sensitivities and crop suitability → dependent modules stale.
+- Change boundary → area, raster sampling, coverage, field weather sampling and area-based volume conversions → dependent metrics stale.
+- Change soil field capacity/wilting point/soil layer → TAW/RAW/depletion and irrigation schedule → dependent water/risk outputs stale.
+- Add confirmed irrigation event → water balance from event date onward; do not alter actual crop stage or weather.
+- Add rainfall observation → rainfall totals/effective water balance after QC; preserve old source snapshots.
+- New satellite scene → vegetation time series and supported vegetation-change rules only.
+- Add soil test → affected soil/nutrient suitability and recommendations only.
+Use a dependency registry so only affected calculations rerun. Keep old results as historical snapshots.
+27. Data freshness and caching
+- Cache external API data by provider/product/grid/time window/parameters.
+- Avoid repeated same-coordinate requests on each page render.
+- Store raw provider payload reference, normalized values and retrieval metadata.
+- Set source-specific TTLs according to provider update cadence; forecasts expire/revalidate more frequently than historic datasets.
+- Retry transient failures with bounded exponential backoff; do not retry invalid inputs indefinitely.
+- Preserve last successful result but mark it stale if refresh fails.
+- Never show a simulated spinner or success toast in place of actual provider result.
+- The UI may use offline cached field records and queue supported farmer edits using an idempotent outbox; live satellite processing and remote scheduled jobs are unavailable offline.
+28. Analysis job pipeline
+1. Validate user, farm, field and version IDs.
+2. Snapshot field geometry/profile/crop/practices and consent state.
+3. Retrieve current/historical/forecast weather required for the requested scope.
+4. Retrieve soil properties and moisture only from connected products.
+5. Retrieve satellite scenes only if the connector is active and useful.
+6. Retrieve terrain if a supported calculation requires it.
+7. Normalize units, dates, timezone and source time semantics.
+8. Apply quality flags, source resolution and field coverage checks.
+9. Determine crop occurrence, stage and stage confidence.
+10. Calculate ET₀/ETc and daily water balance where prerequisites exist.
+11. Calculate soil, nutrient, vegetation and climate metrics where prerequisites exist.
+12. Evaluate documented risk rules.
+13. Generate field-level results and only defensible farm roll-ups.
+14. Compare previous compatible report.
+15. Build evidence-linked actions/recommendations.
+16. Persist immutable report and run audit.
+Each stage reports queued/running/complete/partial/skipped/failed. A timer must never simulate progress. If an optional source fails, the report may be Partial with explicit gaps. If a required input for a requested calculation is missing, that metric is unavailable, not fabricated.
+PART H — FRONTEND VISUAL AND INTERACTION CONTRACT
+29. Information density and design
+- Keep global top navigation persistent and compact.
+- Farm page uses a stable left contextual rail and wide main pane.
+- Field selector is always prominent on field-dependent pages.
+- Dark forest canvas, calm green accent, restrained water blue, amber caution and red critical.
+- Glass surfaces use different fill strengths; dense tables/calculation drawers use high-opacity surfaces for readability.
+- Limit glass layers and decorative image-backed cards. One image should communicate farm/crop/soil/map context, not replace a data visualization.
+- Tables for inspectable numeric values; line charts for time series; bars for daily rainfall/irrigation; maps for spatial data. Every chart has axis labels, units, period, source, freshness, tooltip/keyboard inspection and table alternative.
+- Observed/history lines are solid; forecast is dashed and explicitly labelled.
+- No decorative fake sparklines, placeholder maps pretending to be live, emoji icons, constant glows or invented metrics.
+- Desktop/tablet/mobile layouts must preserve the selected field context and prevent page-wide horizontal overflow.
+30. Metric information drawer
+Every key metric opens a reusable drawer with:
+1. Metric definition and question answered.
+2. Displayed value and unit.
+3. Period and timezone.
+4. Source type and source/product.
+5. Observation time and retrieval time.
+6. Spatial/temporal resolution and field-coverage method.
+7. Formula/method version.
+8. Exact input values and unit conversions.
+9. Intermediate steps and assumptions.
+10. Confidence/uncertainty and limitations.
+11. Related field/crop/alert/action.
+12. Links to raw source or report snapshot where permitted.
+31. Simple and Advanced modes
+Simple: current field, crop/stage, today's weather, water status, urgent risks, next action and readable charts.
+
+Advanced: exact variables, formula breakdowns, raw source metadata, field/grid resolution, soil depths, Kc/Kcb/Ke/Ks, ET₀/ETc, water balance terms, fertilizer nutrient budget, satellite QA, confidence, missing-data policy, model and parameter versions.
+
+Both modes use the same calculations. Switching mode does not trigger recalculation and must preserve selected farm, field, date range and drafts.
+PART I — ACCEPTANCE TESTS / RELEASE GATES
+32. Data isolation and field switching
+- Two farms with different locations never share weather/soil/crop data.
+- Two fields with different crop, variety, soil and irrigation show independent results.
+- Switching field updates all relevant cards, charts, map layer, alerts, actions and provenance.
+- Field selector stays visible and accessible at desktop/tablet/mobile.
+- A farm-wide metric remains labelled as farm-wide while viewing a selected field.
+- A severe field alert remains visible in farm-wide view even if other fields are healthy.
+33. Weather and climate tests
+- Forecast, observed, historical and reanalysis values never merge without labels.
+- Units and timezone are correct.
+- Missing variable or API outage produces partial/unavailable state.
+- Forecast rain is not added to observed rainfall ledger.
+- Time aggregation does not double-sum interval precipitation.
+- Spatial resolution mismatch is disclosed.
+- ET₀ formula matches independently verified reference examples and tests.
+34. Crop phenology tests
+- Crop/variety parameter version is recorded.
+- Exact planting date drives the stage model.
+- GDD base/upper thresholds and missing-day policy are correct.
+- Farmer-confirmed stage is not overwritten by model estimate.
+- Calendar fallback is labelled lower confidence.
+- No precise maturity date appears when required data is missing.
+35. Water and irrigation tests
+- ETc = ET₀ × stage-appropriate Kc.
+- Dual Kc calculation separates Kcb and Ke.
+- Water stress adjusts transpiration using Ks only when the model's inputs exist.
+- TAW/RAW use correct soil/root-depth/crop parameters.
+- Daily depletion equation balances precipitation, runoff, irrigation, capillary rise, ETc and deep percolation without double counting.
+- Depletion is constrained between 0 and TAW.
+- Irrigation depth never exceeds modeled refill need unless a separately justified leaching application is used.
+- Application efficiency converts net depth to gross depth correctly.
+- 1 mm over 1 ha converts to 10 m³.
+- Runtime only appears when flow and area are known.
+- Pulse count/timing only appears when system and infiltration constraints are known.
+- Routine is never counted as actual event.
+- Forecast is shown as a projection, not observed water input.
+36. Nutrient/fertilizer tests
+- Soil-test method/depth/date are retained.
+- N, P and K are calculated independently with appropriate calibration.
+- Existing fertilizer, manure, residue and irrigation-water nutrient credits are not double-counted.
+- Target yield and nutrient uptake assumptions are exposed.
+- Product grade conversion and P/P2O5 or K/K2O basis are correct.
+- Split timing references crop stage and local recommendation.
+- Missing lab/calibration blocks exact-rate prescription.
+- Fertigation requires real system capability and safety conditions.
+37. Soil and satellite tests
+- Lab and mapped estimates remain distinct.
+- Soil property depth and uncertainty are shown.
+- Texture fractions are checked; invalid sums raise warning.
+- NDVI uses actual reflectance bands and QA masks.
+- Cloud/no-data pixels are excluded from statistics.
+- Coverage and pixel resolution are displayed.
+- Low coverage suppresses or qualifies conclusions.
+- No NDVI is synthesized from rainfall.
+- Satellite vegetation decline never automatically diagnoses disease/nutrient deficiency.
+38. Reports, jobs and history tests
+- Each report is immutable and reproducible from its input snapshot.
+- Source outage creates Partial/Failed, not false Complete.
+- Failed run does not replace last successful report.
+- Retry is idempotent; no duplicate jobs/alerts.
+- Editing a source fact marks only dependent calculations stale.
+- Old report keeps prior geometry/profile/crop/model versions.
+- User authorization is checked server-side for all farm and field IDs.
+39. Release requirement
+A feature is production-ready only when UI, data contract, domain calculation, source connection, provenance, persistence, error/partial/offline states, responsive layout, accessibility and automated/manual acceptance tests pass. If a provider, agronomic parameter, calibration or background job is unavailable, mark that feature blocked/planned/unavailable and explain the dependency. Do not simulate a successful connection or calculation.
+PART J — SOURCE AND METHOD REFERENCES
+The master prompt remains the primary product specification. The following official/primary references supplement its method requirements and must be rechecked at implementation time:
+1. FAO, Crop Evapotranspiration — Guidelines for Computing Crop Water Requirements, Irrigation and Drainage Paper 56 (1998): https://www.fao.org/4/X0490E/x0490e00.htm
+2. FAO-56, Chapter 2 — FAO Penman–Monteith equation and meteorological inputs: https://www.fao.org/4/X0490E/x0490e06.htm
+3. FAO-56, Chapter 6 — crop coefficient, crop stages and Kc curve construction: https://www.fao.org/4/X0490E/x0490e0b.htm
+4. FAO-56, Chapter 8 — TAW, RAW, Ks, daily root-zone balance and irrigation forecasting: https://www.fao.org/4/X0490E/x0490e0e.htm
+5. FAO, Integrated Nutrient Management — nutrient application methods/timing and site-specific nutrient management: https://www.fao.org/agriculture/crops/thematic-sitemap/theme/compendium/tools-guidelines/how-to-inm/en/
+6. Open-Meteo Forecast API docs: https://open-meteo.com/en/docs
+7. Open-Meteo Historical Weather API docs: https://open-meteo.com/en/docs/historical-weather-api
+8. NASA POWER Daily API docs: https://power.larc.nasa.gov/docs/services/api/temporal/daily/
+9. NASA GPM IMERG FAQ/data resolution information: https://gpm.nasa.gov/resources/faq
+10. ISRIC SoilGrids product documentation/status: https://isric.org/explore/soilgrids/
+11. Sentinel-2 dataset and band-resolution overview: https://developers.google.com/earth-engine/datasets/catalog/sentinel-2/
+12. NASA SMAP L4 product metadata: https://data.nasa.gov/dataset/smap-l4-global-3-hourly-9-km-ease-grid-surface-and-root-zone-soil-moisture-geophysical-dat
+Important implementation-time note (checked 15 November 2026): ISRIC's SoilGrids public page currently reports that its REST API service is experiencing issues and is temporarily paused. Do not assume the REST endpoint is available; verify again during implementation and provide a truthful alternative/provider state.
+Final builder instruction
+Build My Farms around independently managed fields, not one averaged farm record. For every displayed farm/field metric, implement the source request, validation, calculation, provenance, state, persistence and test described here. Prefer a trustworthy partial result to a fabricated complete dashboard. The system must explain not only what it recommends, but exactly which field inputs, crop parameters, weather observations, formulas, water/soil assumptions, source resolutions and model versions produced that recommendation.

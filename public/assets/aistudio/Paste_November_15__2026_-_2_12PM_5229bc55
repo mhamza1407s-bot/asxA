@@ -1,0 +1,2250 @@
+EXTREME-DETAIL UI RECONSTRUCTION SPECIFICATION
+Water Intelligence — Individual Crop Water Management Dashboard
+This screenshot shows a highly detailed, vertically extended agricultural water-intelligence dashboard for an individual crop field.
+
+The page belongs to the same agricultural platform as the previous Green Valley Farm crop dashboard, but this is a dedicated Water Intelligence page rather than a general crop overview.
+
+Its purpose is to communicate the complete water situation of a particular field:
+- How much water the crop consumes.
+- How much water is supplied by rainfall.
+- How much rainfall actually reaches the root zone.
+- How much irrigation the crop requires.
+- How much water is currently stored in the soil.
+- How the water balance changes over time.
+- How water consumption compares with historical periods.
+- Where the measurements originate and how reliable they are.
+- What irrigation action the farmer should take.
+The design is a long-form, vertically stacked analytics dashboard. Unlike a conventional dashboard with a permanent sidebar, this interface uses the entire available width for its information panels.
+
+The defining visual characteristic is a dark, cinematic emerald-green interface containing eight numbered analytical sections, multiple custom charts, compact data tables, agricultural photography, and green-highlighted recommendations.
+
+The screenshot should be treated as a single continuous page, not as multiple separate screens.
+
+1. Canvas dimensions and overall page geometry
+Inspected reference: 914 × 1498 px
+The actual uploaded reference image measures:
+Property	Value
+Canvas width	914 px
+Canvas height	1498 px
+Aspect ratio	0.610:1
+Orientation	Portrait / vertically extended
+Main content width	Approximately 894 px
+Left outer margin	Approximately 20 px
+Right outer margin	Approximately 0–1 px at the rendered edge
+Main card spacing	Approximately 10–12 px
+
+The interface is designed around a narrow, vertically extended dashboard viewport.
+
+This matters because the design is not a conventional 16:9 desktop dashboard. It deliberately compresses multiple analytical sections into a narrow width while preserving a large amount of information.
+
+Do not redesign this as a wide desktop dashboard. Reproduce the narrow, tall composition, including its compact typography, compressed cards, and horizontally arranged internal charts.
+1.1 Vertical page map
+The following is the approximate vertical coordinate map of the reference.
+Region	Y start	Y end	Approx. height
+Top decorative edge	0	8	8 px
+Breadcrumb and title header	8	151	143 px
+Water status hero	152	317	165 px
+Section 2: Crop water demand	328	616	288 px
+Section 3: Water sources	627	807	180 px
+Section 4: Soil water	818	956	138 px
+Section 5: Water balance	967	1126	159 px
+Section 6: Irrigation schedule	1137	1268	131 px
+Section 7, 8 and Quick Actions	1278	1460	182 px
+Bottom edge	1460	1498	38 px
+
+These are visual reconstruction measurements, not recovered source-code coordinates.
+
+The page uses approximately 10 px vertical spacing between major cards.
+
+2. Global visual environment
+2.1 Background
+The background is a very dark, cinematic agricultural green.
+
+It contains a photographic foliage texture, predominantly visible behind the title and top hero region.
+
+The background should have three visual layers:
+1. A very dark forest-green base.
+2. A blurred green foliage photograph.
+3. Several radial emerald-green light gradients.
+The image must remain dark enough for white typography and translucent panels to remain readable.
+
+Suggested color tokens:
+Token	Color
+Main canvas	#02130B
+Deep background	#001D10
+Secondary background	#032A19
+Card background	#052B1C
+Elevated card	#073823
+Bright emerald	#00C879
+Primary green	#12D987
+Mint green	#43E6A1
+White text	#F1F8F3
+Secondary text	#C0D1C6
+Muted text	#829A8B
+Border	rgba(74, 154, 108, .32)
+
+Suggested global CSS:
+:root {
+    --background: #02130b;
+    --background-deep: #00180e;
+
+    --surface: rgba(3, 39, 24, .88);
+    --surface-light: rgba(7, 54, 34, .88);
+
+    --green: #13d987;
+    --green-bright: #28ed9a;
+    --green-dark: #087e4b;
+
+    --text: #f1f8f3;
+    --text-secondary: #c0d1c6;
+    --text-muted: #829a8b;
+
+    --border: rgba(90, 169, 117, .30);
+
+    --blue: #29b9f3;
+    --amber: #ffbe36;
+    --red: #ff4747;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+
+    font-family: Inter, Arial, sans-serif;
+
+    overflow-x: hidden;
+}
+
+
+2.2 Foliage background
+The background photograph should depict large, overlapping tropical or agricultural green leaves.
+
+The image is:
+- Darkened.
+- Slightly blurred.
+- Low contrast.
+- Primarily concentrated around the top.
+- Visible through gaps between cards.
+It should not appear as a bright photographic wallpaper.
+
+Use:
+.page-background {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+
+    background:
+        linear-gradient(
+            rgba(0, 18, 9, .55),
+            rgba(0, 15, 8, .83)
+        ),
+        url("/assets/green-foliage.webp");
+
+    background-position: center top;
+    background-size: cover;
+}
+
+
+2.3 Card treatment
+The cards use dark green translucent surfaces.
+
+Their edges are defined by very subtle green borders.
+
+They do not have heavy shadows or thick outlines.
+
+Common properties:
+.dashboard-card {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(8, 55, 34, .84),
+            rgba(1, 31, 19, .91)
+        );
+
+    border: 1px solid rgba(65, 145, 95, .30);
+
+    border-radius: 14px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 5px 15px rgba(0,0,0,.13);
+
+    backdrop-filter: blur(13px);
+
+    overflow: hidden;
+}
+
+
+The border radius is smaller than the previous crop overview page. This gives the interface a more compact analytical appearance.
+
+3. Breadcrumb navigation and page header
+
+
+
+
+
+
+
+
+v0.app
+
+
+The header occupies the entire upper region before the first major card.
+
+Approximate vertical range: Y = 8–151 px.
+
+It is not enclosed in a separate card.
+
+The background foliage remains visible behind it.
+3.1 Breadcrumb navigation
+Position:
+- Left: approximately 20 px.
+- Top: approximately 21 px.
+- Height: 13 px.
+The breadcrumb contains:
+
+← My Farms  ›  Green Valley Farm  ›  Field 03
+
+The individual elements are:
+1. Left-facing back arrow.
+2. My Farms.
+3. Right chevron.
+4. Green Valley Farm.
+5. Right chevron.
+6. Field 03.
+Styling:
+- Font size: 9–10 px at reference scale.
+- Weight: 400–500.
+- Color: muted white-gray.
+- Chevron color: muted green-gray.
+- Horizontal gap: 7–9 px.
+The breadcrumb must be very compact.
+
+It is not a large navigation bar.
+3.2 Main page title
+Position:
+- Large blue droplet icon at approximately X = 29 px, Y = 50 px.
+- Heading at approximately X = 76 px, Y = 52 px.
+The icon is a large stylized water droplet.
+
+It uses a bright cyan-blue gradient with a lighter highlight.
+
+Approximate icon dimensions:
+
+31 × 45 px.
+
+The heading reads:
+Water Intelligence
+Typography:
+- Font size: approximately 25–27 px.
+- Weight: 700.
+- Color: near-white.
+- Letter spacing: slightly negative.
+Directly underneath is the subtitle:
+
+Understand how much water this crop is using, how much reaches the root zone, and whether irrigation is needed.
+
+Typography:
+- Approximately 12 px.
+- Weight: 400.
+- Color: light gray-green.
+The subtitle occupies a single horizontal line at the reference width.
+3.3 Context badges
+Under the title and subtitle is a horizontal row of three dark-green rounded capsules.
+
+They are located around Y = 110–139 px.
+
+The badges contain:
+Field 03 – North Block
+
+
+🌱
+
+Maize
+
+
+🌿
+
+Mid-vegetative
+
+
+
+The badges have:
+- Dark translucent emerald backgrounds.
+- Thin green outlines.
+- Rounded capsule shapes.
+- Small icons.
+- Small 10–11 px text.
+They identify the selected field, crop and growth stage.
+3.4 Time filter and update indicator
+This group sits at the upper-right.
+
+The time-filter dropdown is positioned around:
+- X: 796 px.
+- Y: 41 px.
+- Width: 117 px.
+- Height: 33 px.
+It reads:
+
+Last 14 days
+
+A small downward chevron sits at the right.
+
+Appearance:
+- Dark emerald pill.
+- Thin green border.
+- White text.
+- Rounded corners.
+- Slight internal glow.
+Underneath, the update information appears in two lines:
+
+Last updated:
+
+Sep 12, 2026 · 10:24 AM
+
+At the far right is a circular refresh icon in bright green.
+
+The update group is right-aligned.
+
+The time filter should be a real dropdown, not a decorative text label.
+
+4. Water Status at a Glance — hero card
+Primary summary panel
+
+
+
+
+
+
+
+
+
+
+Approximate geometry:
+- X: 20 px.
+- Y: 152 px.
+- Width: 894 px.
+- Height: 165 px.
+- Radius: 14 px.
+This card summarizes the crop's current water situation.
+
+Its internal composition consists of three major horizontal regions:
+1. Crop photograph and crop identification.
+2. Water-status explanation.
+3. Four numerical water indicators.
+The background is dark green and translucent.
+4.1 Left region: Crop photograph
+Approximate dimensions:
+- Width: 230 px.
+- Height: 163 px.
+The photograph depicts dense green maize plants.
+
+The image is cropped tightly, showing:
+- Long green leaves.
+- Several corn stalks.
+- Dense foliage.
+- Bright natural daylight.
+- A small portion of sky near the top.
+The image fills the entire left region.
+
+Use:
+.water-crop-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+
+At the bottom-left of the photograph, an opaque-to-transparent dark gradient creates a readable text region.
+
+Displayed over the image:
+
+Maize
+
+Pioneer P0725
+
+The crop name is approximately 19 px, bold.
+
+The variety is approximately 12 px, regular.
+
+Both are white.
+
+The image's bottom corners align with the outer hero card's rounded corners.
+4.2 Middle region: Water status explanation
+Approximate dimensions:
+- Width: 316 px.
+- Starts around X = 264 px.
+- Ends around X = 546 px.
+Heading:
+
+Water Status at a Glance
+
+Font:
+- Approximately 16 px.
+- Weight: 650.
+- Color: white.
+Description:
+
+"Your maize crop is currently using an estimated 5.8 mm/day of water. With recent rainfall and healthy soil moisture, no irrigation is required today. However, monitor conditions as warmer weather approaches."
+
+The description is compact.
+
+It uses approximately:
+- 12 px font size.
+- 1.35 line height.
+- Light gray-white color.
+The content occupies approximately five lines.
+
+Below is a green status pill containing:
+- Green circular checkmark.
+- Text: No action currently indicated.
+The pill uses a dark green background with bright green text.
+
+The checkmark circle is brighter than the pill background.
+
+This is an important semantic element: the crop is currently considered adequately supplied with water, so no immediate irrigation is indicated.
+4.3 Vertical divider
+A subtle vertical divider separates the description from the four metrics.
+
+It runs from near the top to near the bottom of the card.
+
+Color:
+
+rgba(130, 183, 145, .24).
+4.4 Four water indicators
+The right side contains four equally sized columns.
+
+Each column contains:
+1. Icon.
+2. Large numeric value.
+3. Unit or time period.
+4. Descriptive label.
+The exact values:
+Metric	Icon	Value	Supporting label
+Crop Demand	Blue droplet	5.8	mm/day
+Rainfall	Blue cloud/rain	2.1 mm	Last 24h (Rainfall)
+Irrigation	Green sprinkler	0 mm	Last 7 days (Irrigation)
+Soil Moisture	Golden soil layers	68%	Soil Moisture (Optimal)
+
+Column one
+Blue water droplet icon.
+
+Value:
+
+5.8
+
+Unit:
+
+mm/day
+
+Description:
+
+Crop Demand
+Column two
+Blue cloud with three falling raindrops.
+
+Value:
+
+2.1 mm
+
+Description:
+
+Last 24h
+
+(Rainfall)
+Column three
+Green irrigation/sprinkler icon.
+
+Value:
+
+0 mm
+
+Description:
+
+Last 7 days
+
+(Irrigation)
+Column four
+Stacked golden-brown soil layers icon.
+
+Value:
+
+68%
+
+Description:
+
+Soil Moisture
+
+(Optimal)
+
+Numerical values use approximately 22 px bold typography.
+
+Descriptions use approximately 10–11 px.
+
+The four metric columns are separated by very subtle vertical lines.
+
+5. Section 2 — How much water the crop is using
+Section 02
+
+
+
+
+
+
+
+
+dribbble.com
+
+
+Approximate geometry:
+- X: 20 px.
+- Y: 328 px.
+- Width: 894 px.
+- Height: 288 px.
+- Radius: 14 px.
+This is the first numbered analytical section.
+
+The section number is a circular mint-green badge.
+
+The heading reads:
+
+2  How much water the crop is using
+
+At the right of the heading is a small information icon.
+5.1 Section heading
+Position:
+- Left: approximately 30 px.
+- Top: approximately 342 px.
+The numbered badge is approximately 21 × 21 px.
+
+It contains the number 2 in dark green.
+
+The heading uses:
+- Font size: approximately 15 px.
+- Weight: 650.
+- Color: white.
+The information icon is a small muted gray-green circle containing an i.
+5.2 Upper calculation area
+Below the heading, the card's upper region is divided into two main blocks.
+
+Left side: crop-water calculations.
+
+Right side: growth-stage Kc timeline.
+A. Three calculation metrics
+The left area contains three compact metric columns.
+
+They are:
+Metric	Value	Unit
+ETo	4.2	mm/day
+Kc	1.15	—
+ETc	4.8	mm/day
+
+The labels appear above the values.
+
+The values are larger and bold.
+
+The units appear below.
+
+Approximate styling:
+- Labels: 12 px.
+- Values: 21 px.
+- Units: 11 px.
+- Vertical separators between metrics.
+The three metrics occupy approximately 270 px horizontally.
+B. Formula explanation card
+To their right is a green formula panel.
+
+Approximate dimensions:
+- Width: 170 px.
+- Height: 83 px.
+Background:
+
+Dark emerald green with a slightly brighter green border.
+
+Heading:
+
+ETc = ETo × Kc
+
+This formula is rendered in bright mint green.
+
+Underneath:
+
+ETo represents atmospheric demand, and Kc adjusts it for crop type and growth stage.
+
+The description uses small, compact typography.
+
+The formula card has rounded corners of approximately 11 px.
+
+The formula is important because it explains the relationship between the three numerical measurements.
+
+Mathematically:
+\[
+ET_c = ET_o \times K_c
+\]
+
+With the displayed values:
+\[
+4.2 \times 1.15 = 4.83
+\]
+
+The displayed ETc is rounded to 4.8 mm/day.
+C. Growth Stage Kc Timeline
+A separate horizontal timeline appears on the right.
+
+Approximate width: 397 px.
+
+Heading:
+
+Growth Stage Kc Timeline
+
+The timeline has a thin horizontal track.
+
+Four circular stage markers are positioned along the track.
+
+The stages are:
+Stage	Kc range
+Initial	0.3–0.7
+Development	0.7–1.1
+Mid-Season	1.1–1.25
+Late Season	0.6–0.8
+
+The first, second and fourth circles are gray-green.
+
+The third circle, Mid-Season, is bright green and larger.
+
+The timeline track is muted green, with the active segment bright emerald.
+
+The selected stage is emphasized.
+
+Below each marker:
+- Stage name.
+- Kc range in parentheses.
+The active Mid-Season label is bold and bright white.
+
+Other stages use muted white-gray.
+5.3 Daily Crop Water Demand chart
+This is the largest visual element in Section 2.
+
+It occupies the entire lower portion of the card.
+
+Heading:
+
+Daily Crop Water Demand
+
+At the upper-right of the chart is a legend:
+- Green line with marker: ETc Demand
+- Dashed muted line: Average (4.3 mm/day)
+Chart dimensions
+Approximate:
+- Left: 81 px.
+- Right: 896 px.
+- Top: 495 px.
+- Bottom: 590 px.
+The plot is wide and short.
+Vertical axis
+Label:
+
+mm/day
+
+The tick values:
+- 0
+- 2
+- 4
+- 6
+- 8
+The axis labels are small and white-gray.
+Horizontal axis
+Dates:
+- Aug 30
+- Sep 01
+- Sep 03
+- Sep 05
+- Sep 07
+- Sep 09
+- Sep 11
+- Sep 12
+The dates are evenly distributed along the x-axis.
+Grid
+Thin horizontal and vertical grid lines.
+
+Color:
+
+rgba(130, 180, 145, .14).
+
+The plot background is transparent.
+Main ETc line
+The line is bright green.
+
+Color:
+
+#35E887
+
+Thickness:
+
+Approximately 2 px.
+
+It uses small circular markers.
+
+The line begins around 4.2 mm/day, rises gradually, fluctuates slightly, peaks around 7 mm/day on September 9, then decreases toward approximately 5.5 mm/day on September 12.
+
+Approximate plotted data:
+const cropDemand = [
+  4.2, 4.7, 5.1, 5.3,
+  5.6, 5.7, 5.6, 5.6,
+  6.1, 6.2, 6.1, 5.5,
+  5.5, 6.0, 6.8, 7.2,
+  6.9, 6.5, 5.9, 5.6, 5.5
+];
+
+
+These values are visual approximations to reproduce the curve, not additional measured values supplied by the screenshot.
+Average line
+A horizontal dashed line indicates the average.
+
+Label:
+
+Average (4.3 mm/day)
+
+It should be rendered as a subdued gray-green dashed line.
+
+6. Section 3 — Where the water comes from
+Section 03
+
+
+
+
+
+
+
+
+cleverence.com
+
+
+Approximate geometry:
+- X: 20 px.
+- Y: 627 px.
+- Width: 894 px.
+- Height: 180 px.
+Heading:
+
+3  Where the water comes from
+
+Small information icon at the end.
+
+The card is arranged into three horizontal components:
+1. Water-source stacked bar chart.
+2. Water-source data table.
+3. Rainfall explanation panel.
+6.1 Water Sources chart
+The left component occupies approximately 370 px.
+
+Subheading:
+
+Water Sources (Last 14 Days)
+
+The chart is a stacked column chart.
+Axes
+Vertical axis:
+
+mm
+
+Ticks:
+- 0
+- 20
+- 40
+- 60
+Horizontal axis:
+
+No prominent date labels are visible.
+
+The chart contains approximately seven bars.
+Stacked bar colors
+Data series	Color
+Rainfall	Blue #168EDB
+Effective Rainfall	Light blue #67B8E6
+Irrigation	Green #62D96D
+
+Each bar is composed of segments representing the different water sources.
+
+The first seven visible bar heights are approximately:
+- 20 mm.
+- 35 mm.
+- 25 mm.
+- 43 mm.
+- 18 mm.
+- 18 mm.
+- 23 mm.
+The last bar is approximately 50 mm and contains a green upper segment.
+
+The chart should be implemented using an SVG or Canvas stacked bar renderer.
+Legend
+Below the chart:
+- Blue square: Rainfall.
+- Light-blue square: Effective Rainfall.
+- Green square: Irrigation.
+Text size:
+
+Approximately 10–11 px.
+6.2 Water source history table
+The center component is a compact data table.
+
+Approximate width:
+
+365 px.
+
+It has a darker green background and rounded corners.
+
+Columns:
+Date	Rainfall	Effective Rain	Irrigation	Source
+Sep 12	5.2 mm	4.1 mm	–	Weather API
+Sep 10	12.6 mm	10.3 mm	–	Weather API
+Sep 07	–	–	25 mm	Farmer Log
+
+The table has:
+- A dark header row.
+- Small white column headings.
+- Thin horizontal separators.
+- Muted green row backgrounds.
+- Compact cell padding.
+Typography:
+- Headers: approximately 10 px.
+- Body: approximately 10 px.
+- Values: white-gray.
+- Dates: light gray.
+- Source: muted gray-green.
+The table should remain dense, similar to the screenshot.
+
+Do not turn it into a large conventional table with excessive padding.
+6.3 Rainfall vs Effective Rainfall explanation
+The right component is a small explanatory card.
+
+Approximate width:
+
+145 px.
+
+At the top:
+
+A blue cloud with rain icon.
+
+Heading:
+
+Rainfall vs Effective Rainfall
+
+Description:
+
+Not all rainfall reaches the root zone. Effective rainfall accounts for runoff, infiltration and soil absorption.
+
+The paragraph is compact and occupies approximately four lines.
+
+The card background is darker than the surrounding section.
+
+Its corners are rounded.
+
+This panel explains why total rainfall and usable crop water are different measurements.
+
+7. Section 4 — What is happening in the soil
+Section 04
+
+
+
+
+
+
+
+
+orbitonline.com
+
+
+Approximate geometry:
+- X: 20 px.
+- Y: 818 px.
+- Width: 894 px.
+- Height: 138 px.
+This section is shorter than the previous sections.
+
+Its contents are arranged horizontally into four parts:
+1. Soil root-zone illustration.
+2. Soil moisture gauge and field-capacity measurements.
+3. Available-water measurement.
+4. Explanatory text and details button.
+7.1 Heading
+Text:
+
+4  What is happening in the soil
+
+The number is displayed inside a circular mint-green badge.
+
+Small information icon at the end.
+7.2 Soil root-zone image
+Approximate dimensions:
+- Width: 208 px.
+- Height: 94 px.
+Positioned below the heading at the left.
+
+The image is a horizontal soil cross-section illustration.
+
+It depicts:
+- Green vegetation on the surface.
+- Brown topsoil.
+- Darker underground soil.
+- Plant roots extending downward.
+- A central root system.
+- A vertical double-headed arrow.
+- Text indicating the depth.
+Text inside the illustration:
+
+0–60 cm
+
+Root Zone
+
+The root-zone illustration is a distinct visual asset, not a generic soil photograph.
+
+Its corners are rounded.
+7.3 Soil Moisture block
+The next column contains:
+
+Soil Moisture
+
+68%
+
+A horizontal green progress bar is shown beneath the value.
+
+The bar has:
+- Dark gray-green track.
+- Bright green fill.
+- Rounded endpoints.
+Under the bar:
+
+Field Capacity 32%  |  Wilting Point 12%
+
+This is displayed in small text.
+
+Approximate block width: 220 px.
+7.4 Available Water block
+Heading:
+
+Available Water
+
+Value:
+
+~ 28 mm
+
+Secondary:
+
+(TAW: 40 mm)
+
+The value is approximately 19–20 px bold.
+
+The block has a subtle vertical divider.
+7.5 Soil interpretation
+At the far right:
+
+Your soil can store about 40 mm of water in the root zone, with 28 mm currently available. This is within the optimal range for maize.
+
+Text:
+- Approximately 11 px.
+- Line height: 1.4.
+- Color: muted white.
+At the lower-right is a green action button:
+
+View Soil Details →
+
+The button is compact, rounded, and bright green.
+
+It should navigate to a more detailed soil profile.
+
+8. Section 5 — Water Balance Over Time
+Section 05
+
+
+
+
+
+
+
+
+uk.blog.sencrop.com
+
+
+Approximate geometry:
+- X: 20 px.
+- Y: 967 px.
+- Width: 894 px.
+- Height: 159 px.
+This section contains a large multi-series time chart and a compact summary card.
+
+Heading:
+
+5  Water Balance Over Time
+
+A small information icon appears next to the heading.
+8.1 Main chart
+The chart occupies approximately 690 px horizontally.
+
+Its plot area has:
+- Transparent dark-green background.
+- Horizontal grid lines.
+- Vertical grid lines.
+- Date labels.
+- Numerical y-axis labels.
+Legend
+The legend is positioned near the upper-right of the main plot.
+
+It contains four series:
+Series	Representation	Color
+ETc Demand	Green line	#36D989
+Effective Rainfall	Blue bars	#2199D6
+Irrigation	Green bars	#74CB5C
+Soil Storage	Yellow line	#F7BD31
+
+Each legend item has a small colored indicator followed by a compact label.
+Vertical axis
+Label:
+
+mm
+
+Ticks:
+- 0
+- 25
+- 50
+- 75
+Horizontal axis
+Dates:
+- Aug 30
+- Sep 01
+- Sep 03
+- Sep 05
+- Sep 07
+- Sep 09
+- Sep 11
+- Sep 12
+8.2 Data series
+The chart combines line and bar visualizations.
+ETc Demand
+Green line.
+
+It runs near the 50–60 mm region.
+Effective Rainfall
+Blue vertical bars.
+
+Most bars are relatively short, with larger rainfall events around September 9.
+Irrigation
+Green bars.
+
+These are shown as a separate data series.
+Soil Storage
+Yellow line.
+
+This is a smooth line with circular yellow markers.
+
+It fluctuates around 50–60 mm.
+
+The yellow line is visually prominent.
+
+It should be drawn above the bar series.
+8.3 14-Day Summary card
+A small summary card is positioned on the right.
+
+Approximate width: 190 px.
+
+Heading:
+
+14-Day Summary
+
+Four rows:
+Metric	Value
+Total ETc Demand	67.2 mm
+Total Rainfall	18.4 mm
+Total Irrigation	25.0 mm
+Net Balance	+7.2 mm
+
+Each row is separated by a thin horizontal border.
+
+The last row is emphasized.
+
++7.2 mm is bright green and bold.
+
+The summary card is slightly darker than the main chart panel.
+
+9. Section 6 — Irrigation Requirement and Schedule
+Section 06
+
+
+
+
+
+
+
+
+romeosilvestri.github.io
+
+
+Approximate geometry:
+- X: 20 px.
+- Y: 1137 px.
+- Width: 894 px.
+- Height: 131 px.
+Heading:
+
+6  Irrigation Requirement and Schedule
+
+The content is divided into three major blocks.
+1. Recommended irrigation amount.
+2. Schedule.
+3. Explanatory recommendation and action button.
+9.1 Recommended Irrigation block
+Approximate width: 250 px.
+
+A blue water-droplet icon appears on the left.
+
+At the top:
+
+Recommended Irrigation
+
+Main value:
+
+25 mm
+
+Below:
+
+≈ 250 m³ for this field
+
+The value is large and bold.
+
+The blue droplet is approximately 30 px.
+
+The area has a darker green background with a subtle border and rounded corners.
+
+The reference also displays a small cyan text indicator under the droplet, but its lettering is too small to reliably identify. Do not substitute an invented label for it.
+9.2 Schedule block
+A calendar icon in cyan.
+
+Label:
+
+Schedule
+
+Value:
+
+1 cycle
+
+Below:
+
+Best Window
+
+Next 2 Days
+
+The schedule block is separated by a vertical divider.
+9.3 Explanatory recommendation
+Text:
+
+Based on current soil moisture and forecast, your crop needs 25 mm of irrigation to reach the target root-zone level. This can be applied in one cycle if your system allows it.
+
+Typography:
+- Approximately 11 px.
+- Color: light gray-white.
+- Line height: 1.4.
+9.4 Add to Schedule button
+At the far right:
+
+Add to Schedule +
+
+It is a bright emerald-green pill-shaped rectangular button.
+
+Approximate dimensions:
+- Width: 112 px.
+- Height: 33 px.
+The text is small, semibold, and dark green/white depending on the gradient.
+
+The button must open an irrigation scheduling workflow.
+
+10. Bottom analytics row — Sections 7, 8 and Quick Actions
+The bottom of the screenshot contains three side-by-side cards.
+
+Approximate vertical range:
+
+Y = 1278–1460 px.
+
+The grid uses:
+- Left card: approximately 345 px.
+- Center card: approximately 343 px.
+- Right card: approximately 174 px.
+Gaps:
+
+Approximately 14–16 px.
+
+All three cards have rounded corners and dark emerald surfaces.
+
+11. Section 7 — Historical Water Use
+Section 07
+
+
+
+
+
+
+
+
+dhaara.com
+
+
+Approximate dimensions:
+- Width: 345 px.
+- Height: 181 px.
+Heading:
+
+7  Historical Water Use
+
+A circular number badge appears at the left.
+11.1 Legend
+Two series:
+- Current Period.
+- Previous Year.
+Current Period:
+
+Bright green solid line with circular markers.
+
+Previous Year:
+
+Muted blue dashed line.
+11.2 Chart
+The plot occupies most of the card.
+
+Vertical axis:
+
+mm
+
+Ticks:
+- 0
+- 25
+- 50
+- 75
+Horizontal axis:
+- Aug 30.
+- Sep 03.
+- Sep 07.
+- Sep 11.
+Current Period series
+Bright green line.
+
+It fluctuates between approximately 35 and 60 mm.
+
+Visible markers indicate individual data points.
+Previous Year series
+Blue dashed line.
+
+It stays significantly lower and rises gradually toward the right.
+
+The chart should have subtle horizontal and vertical grid lines.
+
+The background is transparent.
+
+The chart is relatively compact but must remain legible.
+
+12. Section 8 — Data Sources, Quality & Limitations
+Section 08
+Approximate dimensions:
+- Width: 343 px.
+- Height: 181 px.
+Heading:
+
+8  Data Sources, Quality & Limitations
+
+The number badge is bright green and slightly more saturated than the muted badges.
+
+This card contains a small four-column table.
+12.1 Table structure
+The columns are:
+1. Data type.
+2. Source.
+3. Quality.
+4. Confidence percentage.
+Rows:
+Data type	Source	Quality	Confidence
+Weather Data	Open-Meteo	High	98%
+Rainfall	Weather API	High	97%
+Soil Data	Field Survey	Medium	90%
+Model	FAO-56	High	95%
+
+Row styling
+The table has:
+- Transparent or very dark background.
+- Thin horizontal separators.
+- Small 10–11 px text.
+- Compact row height.
+- No heavy outer grid lines.
+Quality colors
+High:
+
+Bright green.
+
+Medium:
+
+Amber/yellow.
+
+Confidence percentages:
+
+White-gray.
+
+The card also contains a small bright-green link at the bottom-right:
+
+View Details →
+
+This should open a more comprehensive data provenance and quality page.
+
+13. Quick Actions panel
+This is the narrow card at the bottom-right.
+
+Approximate dimensions:
+- Width: 174 px.
+- Height: 181 px.
+It is not numbered.
+
+It has a small pale-green action/hand icon.
+
+Heading:
+
+Quick Actions
+
+Font size: approximately 13 px.
+
+Below are three vertically stacked action buttons.
+13.1 View Full Report
+- Document icon.
+- Text: View Full Report.
+- Dark green pill-shaped rectangle.
+13.2 Download PDF
+- Download icon.
+- Text: Download PDF.
+- Dark green pill-shaped rectangle.
+13.3 Compare Periods
+- Comparison/document icon.
+- Text: Compare Periods.
+- Dark green pill-shaped rectangle.
+Each button:
+- Nearly full width.
+- Approximately 36 px high.
+- Rounded corners around 10 px.
+- Small icon at the left.
+- Small white text.
+- Subtle green border or glow.
+The buttons have approximately 10 px vertical gaps.
+
+These are actual operational actions, not merely decorative controls.
+
+14. Complete visual design system
+This section defines the styling that must be shared across the entire page.
+
+The dashboard should look like one coherent application, not eight independently designed cards.
+14.1 Color palette
+Use these CSS variables consistently:
+:root {
+    /* Background */
+    --bg-main: #02130B;
+    --bg-secondary: #032317;
+    --bg-deep: #00190E;
+
+    /* Card surfaces */
+    --card: rgba(4, 39, 24, .90);
+    --card-elevated: rgba(8, 53, 34, .88);
+    --card-inset: rgba(0, 23, 14, .72);
+
+    /* Green */
+    --green-primary: #13D987;
+    --green-bright: #35EC99;
+    --green-muted: #64C995;
+    --green-dark: #087B49;
+
+    /* Typography */
+    --text-primary: #F1F8F3;
+    --text-secondary: #C4D4CA;
+    --text-muted: #849B8C;
+
+    /* Borders */
+    --border: rgba(100, 174, 126, .28);
+    --border-subtle: rgba(100, 174, 126, .14);
+
+    /* Chart colors */
+    --chart-green: #35E887;
+    --chart-blue: #2199DA;
+    --chart-blue-light: #69BCE8;
+    --chart-yellow: #FFBF32;
+    --chart-irrigation: #73D36A;
+
+    /* Status colors */
+    --success: #28E58B;
+    --warning: #F8BC37;
+    --danger: #FF4949;
+    --water: #32BDF0;
+}
+
+
+14.2 Typography hierarchy
+The reference uses compact typography because a large amount of information is presented within a relatively narrow page.
+
+Recommended typography:
+Element	Size	Weight
+Page heading	26 px	700
+Page subtitle	12 px	400
+Breadcrumb	10 px	400
+Context badges	11 px	550
+Hero heading	16 px	650
+Hero metric values	22 px	700
+Section headings	15 px	650
+Subsection headings	12 px	600
+Chart values	10–11 px	400
+Main chart values	10–12 px	500
+Table headers	10 px	600
+Table content	10 px	400
+Button text	10–11 px	600
+Supporting descriptions	10–12 px	400
+
+Use Inter throughout.
+
+Avoid oversized headings, excessively bold paragraphs, and large whitespace between metrics.
+14.3 Rounded corners
+Element	Radius
+Main dashboard cards	14 px
+Hero card	14 px
+Nested metric cards	10–12 px
+Data tables	10 px
+Formula card	11 px
+Buttons	9–11 px
+Context badges	20 px
+Number indicators	50%
+
+14.4 Numbered section badges
+All numbered sections use a circular green badge.
+
+The visual structure:
+.section-number {
+    width: 21px;
+    height: 21px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #49DAB0;
+
+    color: #003C2A;
+
+    font-size: 13px;
+    font-weight: 750;
+}
+
+
+Sections 2–7 use a light mint-green background.
+
+Section 8 uses a more saturated emerald-green background.
+
+The badge should always be positioned immediately to the left of the heading.
+
+15. Exact component hierarchy and frontend architecture
+The following is the recommended React-style component architecture. It can also be implemented using ordinary JavaScript modules and reusable HTML templates.
+WaterIntelligencePage
+│
+├── GlobalBackground
+│   ├── FoliageBackground
+│   ├── DarkOverlay
+│   └── EmeraldGlow
+│
+├── PageHeader
+│   ├── Breadcrumb
+│   ├── TitleRow
+│   │   ├── WaterDropIcon
+│   │   ├── PageTitle
+│   │   └── Subtitle
+│   │
+│   ├── ContextBadges
+│   │   ├── FieldBadge
+│   │   ├── CropBadge
+│   │   └── GrowthStageBadge
+│   │
+│   └── HeaderControls
+│       ├── DateRangeDropdown
+│       ├── LastUpdated
+│       └── RefreshButton
+│
+├── WaterStatusOverview
+│   ├── CropImage
+│   ├── CropIdentity
+│   ├── WaterStatusDescription
+│   ├── CurrentWaterStatus
+│   └── WaterMetricGrid
+│       ├── CropDemandMetric
+│       ├── RainfallMetric
+│       ├── IrrigationMetric
+│       └── SoilMoistureMetric
+│
+├── Section2_CropWaterDemand
+│   ├── SectionHeader
+│   ├── WaterDemandCalculations
+│   │   ├── EToMetric
+│   │   ├── KcMetric
+│   │   ├── ETcMetric
+│   │   └── FormulaCard
+│   ├── GrowthStageKcTimeline
+│   └── DailyCropWaterDemandChart
+│
+├── Section3_WaterSources
+│   ├── SectionHeader
+│   ├── WaterSourcesBarChart
+│   ├── WaterSourcesHistoryTable
+│   └── EffectiveRainfallExplanation
+│
+├── Section4_SoilWater
+│   ├── SectionHeader
+│   ├── RootZoneIllustration
+│   ├── SoilMoistureProgress
+│   ├── AvailableWaterMetric
+│   └── SoilInterpretation
+│
+├── Section5_WaterBalance
+│   ├── SectionHeader
+│   ├── WaterBalanceChart
+│   │   ├── ETcDemandSeries
+│   │   ├── EffectiveRainfallSeries
+│   │   ├── IrrigationSeries
+│   │   └── SoilStorageSeries
+│   └── FourteenDaySummary
+│
+├── Section6_IrrigationSchedule
+│   ├── SectionHeader
+│   ├── RecommendedIrrigation
+│   ├── IrrigationSchedule
+│   ├── RecommendationExplanation
+│   └── AddToScheduleButton
+│
+└── BottomAnalyticsGrid
+    ├── Section7_HistoricalWaterUse
+    │   ├── SectionHeader
+    │   ├── ChartLegend
+    │   └── HistoricalComparisonChart
+    │
+    ├── Section8_DataQuality
+    │   ├── SectionHeader
+    │   ├── DataQualityTable
+    │   └── ViewDetailsButton
+    │
+    └── QuickActions
+        ├── ViewFullReport
+        ├── DownloadPDF
+        └── ComparePeriods
+
+
+This architecture is important because the page contains multiple independent analytical components.
+
+For example, the chart components should not be embedded directly inside a single enormous HTML block.
+
+Each chart should have its own rendering function and receive its data through props or a shared data object.
+
+16. Recommended exact CSS layout architecture
+The original composition is a single-column vertical page.
+
+Every major numbered section spans the full available width.
+
+The internal components of each section use their own grid or flex layouts.
+16.1 Main page
+.water-page {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    padding: 8px 20px 24px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    isolation: isolate;
+}
+
+
+16.2 Header
+.page-header {
+    position: relative;
+
+    height: 134px;
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+}
+
+
+The title and subtitle are on the left.
+
+The date selector and last-updated information are positioned on the right.
+16.3 Hero
+.water-overview {
+    height: 165px;
+    flex-shrink: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        230px
+        300px
+        minmax(0, 1fr);
+
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+
+The final column is internally divided into four equal metrics.
+16.4 Section 2
+.crop-demand-section {
+    height: 288px;
+    flex-shrink: 0;
+
+    display: grid;
+
+    grid-template-rows:
+        27px
+        105px
+        minmax(0, 1fr);
+
+    padding: 10px;
+}
+
+
+The upper row is a nested grid:
+.demand-top {
+    display: grid;
+
+    grid-template-columns:
+        1.05fr
+        1.15fr;
+
+    gap: 14px;
+}
+
+
+The bottom chart takes the remaining available height.
+16.5 Section 3
+.water-sources-section {
+    height: 180px;
+    flex-shrink: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        1.02fr
+        1.04fr
+        .40fr;
+
+    gap: 12px;
+
+    padding: 10px;
+}
+
+
+The heading should span all columns.
+16.6 Section 4
+.soil-water-section {
+    height: 138px;
+    flex-shrink: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        1.15fr
+        1.08fr
+        .85fr
+        1.45fr;
+
+    gap: 12px;
+
+    padding: 10px;
+}
+
+
+The heading spans the full width.
+16.7 Section 5
+.water-balance-section {
+    height: 159px;
+    flex-shrink: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        190px;
+
+    gap: 12px;
+
+    padding: 10px;
+}
+
+
+The chart occupies the large area.
+
+The summary card is aligned to the right.
+16.8 Section 6
+.irrigation-schedule-section {
+    height: 131px;
+    flex-shrink: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        250px
+        180px
+        minmax(0, 1fr)
+        112px;
+
+    gap: 12px;
+
+    padding: 10px;
+}
+
+
+16.9 Bottom row
+.bottom-analytics-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        .51fr;
+
+    gap: 14px;
+
+    height: 182px;
+    flex-shrink: 0;
+}
+
+.bottom-card {
+    min-width: 0;
+    height: 100%;
+}
+
+
+The above measurements are tuned to the 914 px screenshot. For another viewport, use a proportional scaling strategy rather than hardcoding the same pixel heights at every screen size.
+
+17. Chart rendering specifications
+Charts are particularly important in this interface.
+
+There are five distinct analytical chart types.
+
+They should not all use the same generic chart template.
+Section	Chart type	Rendering approach
+2	Line chart	SVG
+3	Stacked bar chart	SVG or Canvas
+5	Mixed bar and line chart	SVG or Canvas
+7	Two-series comparison chart	SVG
+4	Progress indicator	CSS or SVG
+
+17.1 Common chart appearance
+All charts share these properties:
+- Transparent background.
+- No white chart panels.
+- Thin muted axes.
+- Subtle grid lines.
+- Small axis labels.
+- Minimal chart borders.
+- Carefully positioned legends.
+- Colored series markers.
+Avoid using default chart-library styling.
+
+Default chart legends, white backgrounds, thick axes, and large tooltips would make the result look significantly different from the reference.
+17.2 SVG chart example
+A reusable chart renderer should calculate:
+- X-coordinate based on data index or date.
+- Y-coordinate based on the numerical value.
+- Grid line positions.
+- Axis labels.
+- SVG path coordinates.
+- Marker positions.
+The green line should be rendered as an SVG path.
+
+For example:
+function createLinePath(points) {
+    return points.map((point, index) => {
+        const command = index === 0 ? "M" : "L";
+
+        return `${command} ${point.x} ${point.y}`;
+    }).join(" ");
+}
+
+
+Then:
+<svg viewBox="0 0 800 130">
+    <path
+        d="M 20 80 L 90 70 L 160 63"
+        fill="none"
+        stroke="#35E887"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+</svg>
+
+
+For smoother line charts, use cubic Bézier interpolation.
+
+For the stacked bars, use individual <rect> elements.
+
+For the water balance chart, draw the bars first and the line series afterward so that the lines remain visible.
+
+18. Data structure for the complete page
+The dashboard should be driven by a single structured data model.
+
+Here is a practical starting point:
+const waterIntelligence = {
+    field: {
+        name: "Field 03",
+        block: "North Block",
+        farm: "Green Valley Farm"
+    },
+
+    crop: {
+        name: "Maize",
+        variety: "Pioneer P0725",
+        growthStage: "Mid-vegetative"
+    },
+
+    reporting: {
+        period: "Last 14 days",
+        updatedAt: "2026-09-12 10:24 AM"
+    },
+
+    overview: {
+        cropDemand: 5.8,
+        rainfall24h: 2.1,
+        irrigation7d: 0,
+        soilMoisture: 68,
+        status: "No action currently indicated"
+    },
+
+    demand: {
+        eto: 4.2,
+        kc: 1.15,
+        etc: 4.8,
+        average: 4.3,
+
+        growthStages: [
+            { name: "Initial", range: "0.3–0.7" },
+            { name: "Development", range: "0.7–1.1" },
+            { name: "Mid-Season", range: "1.1–1.25" },
+            { name: "Late Season", range: "0.6–0.8" }
+        ]
+    },
+
+    waterSources: {
+        records: [
+            {
+                date: "Sep 12",
+                rainfall: "5.2 mm",
+                effectiveRain: "4.1 mm",
+                irrigation: "–",
+                source: "Weather API"
+            },
+            {
+                date: "Sep 10",
+                rainfall: "12.6 mm",
+                effectiveRain: "10.3 mm",
+                irrigation: "–",
+                source: "Weather API"
+            },
+            {
+                date: "Sep 07",
+                rainfall: "–",
+                effectiveRain: "–",
+                irrigation: "25 mm",
+                source: "Farmer Log"
+            }
+        ]
+    },
+
+    soil: {
+        moisture: 68,
+        availableWater: 28,
+        totalAvailableWater: 40,
+        fieldCapacity: 32,
+        wiltingPoint: 12,
+        rootDepth: "0–60 cm"
+    },
+
+    waterBalance: {
+        totalETcDemand: 67.2,
+        totalRainfall: 18.4,
+        totalIrrigation: 25.0,
+        netBalance: 7.2
+    },
+
+    irrigation: {
+        recommended: 25,
+        cycles: 1,
+        bestWindow: "Next 2 Days",
+        volume: 250
+    },
+
+    dataQuality: [
+        {
+            name: "Weather Data",
+            source: "Open-Meteo",
+            quality: "High",
+            confidence: 98
+        },
+        {
+            name: "Rainfall",
+            source: "Weather API",
+            quality: "High",
+            confidence: 97
+        },
+        {
+            name: "Soil Data",
+            source: "Field Survey",
+            quality: "Medium",
+            confidence: 90
+        },
+        {
+            name: "Model",
+            source: "FAO-56",
+            quality: "High",
+            confidence: 95
+        }
+    ]
+};
+
+
+Historical chart arrays and the full water-source series should be separate datasets.
+
+Do not fabricate historical readings by simply interpolating the summary numbers. The displayed charts should ultimately use actual dated observations.
+
+19. Interactive behavior and navigation
+Every interactive element in the screenshot should have real functionality.
+Element	Expected behavior
+Breadcrumb back arrow	Return to farm page
+My Farms	Navigate to farm list
+Green Valley Farm	Open farm overview
+Field badge	Show selected field context
+Last 14 days dropdown	Change reporting period
+Refresh icon	Refresh dashboard data
+Information icons	Open explanatory tooltips
+Growth timeline	Show crop-stage coefficient information
+Water demand chart	Show individual date values
+Water source bars	Show rainfall and irrigation details
+Water source table	Open individual source records
+View Soil Details	Open detailed soil analysis
+Water balance chart	Inspect individual dates and series
+Add to Schedule	Open irrigation scheduling form
+Historical chart	Change comparison period
+Data Quality View Details	Open source and quality information
+View Full Report	Generate/open full report
+Download PDF	Download a report as PDF
+Compare Periods	Open comparison interface
+
+19.1 Hover interactions
+Use restrained hover effects.
+
+For example:
+.interactive-card {
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        transform .18s ease;
+}
+
+.interactive-card:hover {
+    border-color: rgba(42, 224, 137, .48);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(9, 67, 42, .94),
+            rgba(2, 35, 21, .96)
+        );
+}
+
+
+Do not apply excessive scaling or large glowing effects.
+
+The original design is sophisticated and restrained.
+19.2 Date filtering
+The Last 14 Days dropdown should support different reporting ranges.
+
+For example:
+- Last 7 days.
+- Last 14 days.
+- Last 30 days.
+- Last 90 days.
+- Custom range.
+When the selection changes, update:
+- Overview metrics.
+- Daily crop water demand.
+- Water-source chart.
+- Water-source table.
+- Water balance chart.
+- Historical comparisons.
+- Summary totals.
+The date range should not merely change the text inside the dropdown.
+
+20. Asset requirements
+The following images are essential to reproduce the screenshot.
+
+
+
+
+
+
+
+
+
+
+01. Maize crop photograph
+Used in the Water Status at a Glance card.
+
+
+
+
+
+
+
+
+
+
+02. Foliage background
+Used behind the entire dashboard.
+
+
+
+
+
+
+
+
+
+
+03. Root-zone illustration
+Used in Section 4.
+
+
+
+
+
+
+
+
+
+
+04. Water droplet illustration
+Used in page heading and irrigation metrics.
+
+Icon requirements
+Use a consistent SVG icon library for the majority of interface symbols.
+
+Required icon categories:
+- Back arrow.
+- Chevron.
+- Refresh.
+- Map pin.
+- Water droplet.
+- Rain cloud.
+- Sprinkler.
+- Soil layers.
+- Information.
+- Calendar.
+- Chart.
+- Checkmark.
+- Download.
+- Document.
+- Comparison.
+- Irrigation.
+For the crop and root-zone illustrations, use dedicated agricultural SVGs or photographs.
+
+21. Responsive implementation
+The supplied screenshot is a portrait-format long dashboard.
+
+Its internal card structure should be preserved at the reference viewport.
+
+At smaller widths, the interface should progressively reorganize rather than shrink everything until the text becomes unreadable.
+
+Recommended behavior:
+Viewport	Layout
+900–1100 px	Preserve reference layout
+768–899 px	Slightly reduce internal gaps and card padding
+600–767 px	Stack the three-column analytical regions
+400–599 px	Stack hero content and all metric groups
+Below 400 px	Single-column cards with compact chart legends
+
+For narrow phones:
+- Move the date filter below the page title.
+- Stack the crop photograph above the status description.
+- Change the four water metrics into a 2 × 2 grid.
+- Stack the water source chart and table.
+- Stack soil measurements vertically.
+- Place the water balance summary below the chart.
+- Stack the bottom three cards.
+The desktop/reference version must remain the primary visual target.
+
+22. Important implementation details that determine visual accuracy
+These are the areas where a developer is most likely to accidentally produce a page that looks different from the screenshot.
+
+1. Do not introduce a sidebar.
+
+The screenshot has no permanent sidebar. All content uses the available horizontal space.
+
+2. Do not make the hero card excessively tall.
+
+It is a compact summary card, not another full crop profile.
+
+3. Preserve the numbered section sequence.
+
+The hero card is unnumbered. The analytical sections start at 2 and continue through 8.
+
+4. Keep all section headings aligned.
+
+The number circles, headings and information icons must follow the same horizontal baseline.
+
+5. Do not use white chart backgrounds.
+
+All charts sit directly on dark green surfaces.
+
+6. Keep chart legends compact.
+
+The legends are small, horizontally arranged and integrated into the chart area.
+
+7. Do not replace charts with generic statistic cards.
+
+The actual chart visualizations are central to the page.
+
+8. Preserve the data-table density.
+
+The water-source table and data-quality table use small typography and compact row heights.
+
+9. Use different accent colors for different types of information.
+- Green: ETc, crop status and actions.
+- Blue: rainfall and water.
+- Yellow: soil storage and caution.
+- Amber: medium-quality data.
+- Red: critical warnings, if applicable.
+10. Preserve the bottom three-card arrangement.
+
+Historical Water Use, Data Sources, and Quick Actions must appear side by side at the reference width.
+
+11. Keep the dark atmospheric background visible.
+
+The spaces between cards should not become flat black.
+
+12. Avoid excessive empty space.
+
+This is a high-density analytics interface. The reference uses nearly all available card space.
+
+23. Final pixel-reconstruction checklist
+Reconstruction progress
+0%
+
+
+
+0 of 46 implementation requirements checked
+Global layout
+[ ] 914 × 1498 reference proportions
+[ ] Dark forest-green foliage background
+[ ] 20 px approximate horizontal content margin
+[ ] Compact breadcrumb at top
+[ ] No sidebar
+[ ] Eight numbered analytical sections
+
+
+Header and overview
+[ ] Blue water droplet icon
+[ ] Water Intelligence heading and subtitle
+[ ] Three context badges
+[ ] Last 14 days dropdown
+[ ] Last updated timestamp and refresh icon
+[ ] Maize photograph
+[ ] Water Status at a Glance explanation
+[ ] Four water metric columns
+[ ] No action currently indicated status pill
+
+
+Section 2
+[ ] Three ETo, Kc and ETc metric columns
+[ ] Formula explanation card
+[ ] Four-stage Kc timeline
+[ ] Daily Crop Water Demand line chart
+[ ] Average 4.3 mm/day dashed reference
+
+
+Section 3
+[ ] Water Sources stacked bar chart
+[ ] Rainfall, Effective Rainfall and Irrigation legend
+[ ] Three-row water-source history table
+[ ] Rainfall vs Effective Rainfall explanation
+
+
+Section 4 and 5
+[ ] Root-zone illustration with 0–60 cm label
+[ ] 68% soil moisture bar
+[ ] 28 mm available water
+[ ] 40 mm total available water
+[ ] Water Balance mixed chart
+[ ] Fourteen-day summary with +7.2 mm net balance
+
+
+Section 6, 7 and 8
+[ ] 25 mm recommended irrigation
+[ ] One-cycle schedule
+[ ] Next 2 Days window
+[ ] Add to Schedule button
+[ ] Historical water comparison chart
+[ ] Four-row data-quality table
+[ ] Quick Actions with three buttons
+
+
+Visual finishing
+[ ] Inter typography
+[ ] Consistent rounded corners
+[ ] Subtle green borders
+[ ] Correct chart series colors
+[ ] Small, readable chart labels
+[ ] Compact data tables
+[ ] Dark translucent nested surfaces
+[ ] Consistent section-heading alignment
+[ ] Functional navigation and buttons
+
+
+
+24. Final developer handoff — What the finished page must look like
+The finished implementation must recreate the screenshot as a single vertically scrolling Water Intelligence dashboard.
+
+The visual experience should follow this exact order:
+1. A compact breadcrumb navigation.
+2. A large Water Intelligence heading with a blue droplet.
+3. Three contextual crop badges and a date-range filter.
+4. A horizontal Water Status at a Glance card with a real maize photograph, descriptive text, and four water metrics.
+5. Section 2, showing crop water demand, ETo, Kc, ETc, a growth-stage timeline, and a green line chart.
+6. Section 3, showing the sources of water using a stacked bar chart, a historical table, and an effective-rainfall explanation.
+7. Section 4, showing the root-zone illustration, soil moisture, available water, and soil interpretation.
+8. Section 5, showing the multi-series water balance chart and 14-day summary.
+9. Section 6, showing the recommended irrigation amount, scheduling details, and Add to Schedule action.
+10. Section 7, showing current and previous-year historical water usage.
+11. Section 8, showing data sources, quality levels and confidence percentages.
+12. Quick Actions, containing View Full Report, Download PDF and Compare Periods.
+The finished result should retain:
+- The dark emerald-green color identity.
+- The photographic agricultural atmosphere.
+- The dense information architecture.
+- The compact typography.
+- The eight numbered sections.
+- The custom analytical charts.
+- The small data tables.
+- The subtle green glassmorphism.
+- The precise horizontal and vertical relationships between panels.

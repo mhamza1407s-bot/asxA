@@ -1,0 +1,1476 @@
+Complete pixel-level UI/UX and frontend engineering specification
+The image depicts a premium, dark-themed agricultural farm management dashboard, specifically the My Farms overview page. The interface is designed to look like a sophisticated enterprise SaaS platform, combining a nature-inspired visual identity, translucent glassmorphism, photographic agricultural backgrounds, luminous green accents, and a structured data-management interface.
+
+The following specification breaks down the screenshot into its individual visual layers, components, dimensions, spacing, colors, typography, interactions, background treatments, borders, shadows, and responsive implementation requirements.
+
+The objective is to make it possible for a frontend developer to reconstruct the interface from scratch using HTML, CSS, and JavaScript, with the closest possible visual match to the reference.
+
+1. Canvas, viewport and global composition
+
+
+
+
+
+
+
+
+dribbble.com
+
+
+Original screenshot dimensions:
+- Width: 1954 pixels.
+- Height: 1224 pixels.
+- Aspect ratio: approximately 1.596:1.
+- Image format: RGBA.
+- Overall layout: desktop-first dashboard.
+- Primary design direction: dark, nature-inspired, glassmorphic enterprise interface.
+The entire dashboard occupies almost the full viewport.
+
+There is no conventional website navigation bar, sidebar, browser-style header, or large introductory hero section. Instead, the interface immediately presents the farm management workspace.
+
+The composition follows a vertically stacked layout:
+1. Global background and atmospheric decorative layer.
+2. Page heading and primary action.
+3. Four agricultural overview statistic cards.
+4. Search, filtering, sorting, and display controls.
+5. Large farm data table.
+The layout is predominantly horizontal, using almost the entire available screen width.
+Main spacing
+Approximate measurements based on the 1954 × 1224 reference:
+Element	Approximate dimensions
+Outer horizontal padding	47–48 px
+Header height	140–145 px
+Header-to-statistics gap	30–35 px
+Statistics cards height	165–168 px
+Statistics card gap	29–30 px
+Statistics-to-toolbar gap	48–50 px
+Toolbar height	70 px
+Toolbar-to-table gap	33–35 px
+Table container height	620–625 px
+
+These are reconstruction estimates rather than measurements from the original source CSS.
+
+2. Global background system
+The background is one of the most important parts of the entire design.
+
+It is not a flat black background. It uses a layered photographic and gradient-based composition.
+
+The background creates the impression of standing inside a dark, sophisticated agricultural environment.
+2.1 Base background
+The foundation is an extremely dark green-black surface.
+
+Suggested CSS:
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    background-color: #03100c;
+
+    color: #f1f7f3;
+
+    font-family: "Inter", sans-serif;
+
+    overflow-x: hidden;
+}
+
+
+The dominant background colors include:
+Color	Purpose
+#020907	Deepest black-green
+#03130E	Main background
+#061C13	Dark green atmospheric areas
+#092719	Subtle green illumination
+#102D1B	Background foliage
+#183B22	Brighter foliage highlights
+
+2.2 Background photography
+Large, darkened agricultural photographs are positioned behind the dashboard.
+
+The photographs include:
+- Oversized green leaves.
+- Cropped tropical foliage.
+- Agricultural landscapes.
+- Subtle green vegetation.
+- Dark natural textures.
+The most prominent foliage is visible across the upper section of the screenshot.
+
+There is a large green leaf extending diagonally from approximately the upper-middle region toward the upper-right region.
+
+Another broad leaf appears around the upper-right corner.
+
+These leaves are deliberately oversized and cropped by the viewport boundaries.
+
+The photographic imagery must not interfere with the legibility of the dashboard.
+Background implementation
+Use several independent layers:
+.dashboard {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            ellipse at 52% 15%,
+            rgba(12, 90, 45, 0.16),
+            transparent 40%
+        ),
+        radial-gradient(
+            ellipse at 0% 70%,
+            rgba(31, 112, 49, 0.17),
+            transparent 35%
+        ),
+        linear-gradient(
+            120deg,
+            #06180f,
+            #020b08 55%,
+            #03140d
+        );
+}
+
+
+The photographic foliage should be placed in absolutely positioned background layers, using object-fit: cover.
+
+A final dark overlay should be placed above the photographs.
+
+Important: The photographs must remain visible as subtle environmental details. They should not become large, distracting hero images.
+
+3. Main page header
+
+
+
+
+
+
+
+
+apps.apple.com
+
+
+The header occupies the top-left and top-right portions of the page.
+
+It contains two primary groups:
+- Branding and page identification on the left.
+- Primary action button on the right.
+There is no enclosing header card. The header elements sit directly on the global background.
+3.1 Branding icon
+Position:
+- Approximately 48 px from the left viewport boundary.
+- Approximately 70 px from the top.
+- Width: approximately 150 px.
+- Height: approximately 137 px.
+The icon is enclosed inside a rounded-square glass container.
+Container appearance
+- Rounded corners: approximately 32 px.
+- Background: translucent dark green.
+- Border: thin, subtle green border.
+- Background blur: approximately 15–20 px.
+- Soft green illumination.
+- Very subtle internal shadow.
+Suggested styling:
+.brand-icon {
+    width: 150px;
+    height: 137px;
+
+    border-radius: 32px;
+
+    background: linear-gradient(
+        145deg,
+        rgba(31, 105, 54, 0.38),
+        rgba(3, 29, 17, 0.58)
+    );
+
+    border: 1px solid rgba(100, 220, 135, 0.2);
+
+    backdrop-filter: blur(20px);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,0.12),
+        0 8px 30px rgba(0,0,0,0.25);
+}
+
+
+Icon artwork
+Inside the square is a stylized agricultural leaf symbol.
+
+It consists of approximately three prominent green leaves:
+- A tall leaf extending upward.
+- A secondary leaf extending diagonally.
+- A broader lower leaf.
+- Thin dark-green stems.
+- Different shades of green for depth.
+The symbol is centered.
+
+The artwork has a slightly dimensional appearance rather than being a simple flat icon.
+3.2 Page title
+Immediately to the right of the logo:
+
+My Farms
+
+Typography:
+- Font family: Inter or a similar modern sans-serif.
+- Font weight: 700–750.
+- Font size: approximately 65–68 px at the original screenshot resolution.
+- Color: near-white, approximately #F3F7F4.
+- Letter spacing: slightly negative, approximately -1.5px.
+- Line height: approximately 1.05.
+The title is aligned toward the upper-middle portion of the logo.
+3.3 Subtitle
+Immediately below the title:
+
+"Manage your farms and explore detailed insights"
+
+Styling:
+- Font size: approximately 25–26 px.
+- Font weight: 400.
+- Color: #C6D0CB.
+- Line height: 1.4.
+- No background.
+- No border.
+The subtitle remains on one line at the reference viewport width.
+3.4 Add Farm button
+
+Add Farm
+
+Position:
+- Top-right portion of the screen.
+- Approximately 1670 px from the left.
+- Approximately 95 px from the top.
+- Width: approximately 245 px.
+- Height: approximately 73 px.
+Appearance
+This is a prominent bright-green pill-shaped button.
+
+Its background transitions from lighter green to saturated green.
+
+Suggested styling:
+.add-farm-button {
+    height: 73px;
+    padding: 0 35px;
+
+    border-radius: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+
+    background: linear-gradient(
+        110deg,
+        #83ed85,
+        #12d66b
+    );
+
+    color: #03190c;
+
+    font-size: 25px;
+    font-weight: 700;
+
+    border: 1px solid rgba(170,255,180,0.55);
+
+    box-shadow:
+        0 0 24px rgba(24, 220, 91, 0.25),
+        0 5px 18px rgba(0,0,0,0.25);
+}
+
+
+The plus icon is dark green or black, approximately 25–28 px.
+
+The button has a luminous appearance, making it the strongest visual action in the header.
+
+4. Agricultural overview statistics
+Four-card horizontal layout
+This section begins approximately 35 px below the header.
+
+It contains four equally sized horizontal cards.
+
+All four cards share the same structural layout, but each has a different photographic background, icon, accent color, and information.
+
+
+
+
+
+
+
+
+
+
+Farms
+
+
+
+
+
+
+
+
+
+
+
+Fields
+
+
+
+
+
+
+
+
+
+
+
+Total Area
+
+
+
+
+
+
+
+
+
+
+
+Alerts
+
+
+4.1 Card dimensions and placement
+Each card approximately measures:
+- Width: 437 px.
+- Height: 166 px.
+- Border radius: 28–30 px.
+Horizontal gap: approximately 30 px.
+
+The four cards are distributed evenly across the available width.
+
+The cards have no large external margins between them beyond their consistent grid gap.
+
+Suggested CSS:
+.stats-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 30px;
+
+    margin-top: 34px;
+}
+
+.stat-card {
+    position: relative;
+
+    height: 166px;
+
+    overflow: hidden;
+
+    border-radius: 30px;
+
+    border: 1px solid rgba(119, 224, 154, 0.38);
+
+    background: rgba(9, 43, 25, 0.48);
+
+    backdrop-filter: blur(18px);
+}
+
+
+4.2 Card background photography
+Each card has a different agricultural image.
+
+The image fills the entire card.
+
+Use:
+.stat-card img {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+A dark gradient overlay must sit above the photograph:
+.stat-card::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        90deg,
+        rgba(0, 23, 13, 0.82),
+        rgba(0, 19, 11, 0.38),
+        rgba(0, 12, 8, 0.55)
+    );
+}
+
+
+The left side is particularly dark to ensure that the icon and text remain visible.
+
+The right side allows more photographic detail to show through.
+4.3 Card one: Farms
+Green accent
+Displayed information:
+12
+Farms
+
+Additional indicator:
+
+↑ +1
+
+The card contains:
+- A farm-building icon on the left.
+- Large numerical value.
+- Small descriptive label.
+- Positive change indicator on the lower-right side.
+Icon
+A bright green agricultural barn or farmhouse symbol.
+
+Approximate dimensions: 65 × 65 px.
+
+Color: #20D889.
+
+The icon is positioned approximately 27 px from the left card edge.
+Text
+Number:
+- Approximately 52 px.
+- Weight 700.
+- White.
+Label:
+- Approximately 24 px.
+- Regular weight.
+- Light gray.
+Change indicator:
+- Approximately 23 px.
+- Bright green.
+- Upward arrow.
+- Text +1.
+Background image: a green agricultural landscape with a farmhouse or barn visible toward the right.
+
+Border: medium green.
+4.4 Card two: Fields
+Displayed information:
+
+48
+
+Fields
+
+Additional indicator:
+
+↑ +2
+
+Icon: stylized agricultural crop rows.
+
+The icon uses a bright lime-to-green treatment.
+
+Approximate icon dimensions: 65 × 65 px.
+
+Background image: an aerial perspective of neatly aligned green agricultural crop rows, with mountains and a green landscape in the distance.
+
+Accent color: luminous green.
+
+Border: green.
+
+The numerical value, typography, and positioning match the first card.
+4.5 Card three: Total Area
+Displayed information:
+
+2,850 ha
+
+Total Area
+
+Additional indicator:
+
+↑ +120 ha
+
+Icon: large green leaf symbol.
+
+Unlike the first two cards, the number includes the unit ha directly beside the numerical value.
+
+The numerical typography is approximately 43–45 px.
+
+The leaf icon is bright lime green.
+
+Background image: close-up green foliage and leaves.
+
+The card uses a slightly darker green border.
+
+The card's content is arranged horizontally, with the icon at the left, the number in the center, and the growth indicator positioned toward the lower-right.
+4.6 Card four: Alerts
+Amber accent
+Displayed information:
+
+3
+
+Alerts
+
+Additional indicator:
+
+↓ -1
+
+Icon: yellow triangular warning symbol containing an exclamation mark.
+
+Background image: agricultural farmland photographed in golden sunset lighting.
+
+Unlike the first three cards, this card uses an amber/orange visual treatment.
+
+Suggested palette:
+- Main icon: #FFBF37.
+- Border: rgba(255, 184, 54, 0.65).
+- Indicator: #FF6C2E.
+- Subtle background illumination: dark amber.
+The card must still follow the exact same structural layout as the other statistics cards.
+
+5. Search, filter, sorting and view toolbar
+This section is positioned beneath the four statistics cards.
+
+It is a single horizontal control row.
+
+There are five major functional elements:
+1. Search input.
+2. Farm category filter.
+3. Status filter.
+4. Sorting dropdown.
+5. List/grid view selector.
+The toolbar has no large surrounding panel. Instead, each control has its own dark translucent rounded background.
+5.1 Search input
+Position:
+- Starts approximately 47 px from the left.
+- Width: approximately 830 px.
+- Height: approximately 70 px.
+It is the widest element in the toolbar.
+Appearance
+- Rounded capsule border radius: 38 px.
+- Dark transparent green-black background.
+- Subtle gray-green border.
+- Soft internal glass effect.
+Inside the search input:
+- Search icon at the left.
+- Placeholder text beside it.
+Placeholder:
+
+"Search farms, fields or locations..."
+
+Typography:
+- Approximately 23 px.
+- Color: muted gray, approximately #A8B1AC.
+Search icon:
+- White or light gray.
+- Approximately 27 px.
+- Positioned 28 px from the left.
+The input should have horizontal padding of approximately 28 px.
+
+Suggested implementation:
+.search-input {
+    height: 70px;
+
+    border-radius: 40px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 22px;
+
+    padding: 0 28px;
+
+    background: rgba(18, 35, 29, 0.68);
+
+    border: 1px solid rgba(150, 185, 165, 0.12);
+
+    backdrop-filter: blur(20px);
+}
+
+
+The input should support live filtering of farm records.
+5.2 All Farms dropdown
+Positioned directly after the search input.
+
+Approximate dimensions:
+- Width: 193 px.
+- Height: 70 px.
+Label:
+
+All Farms
+
+A small downward-facing chevron appears at the right.
+
+Styling:
+- Dark translucent background.
+- Fully rounded capsule.
+- Thin green-gray border.
+- White text.
+- Approximately 22 px font size.
+- Horizontal padding around 25 px.
+The control should open a dropdown containing the available farm categories or groupings.
+5.3 All Status dropdown
+Approximate dimensions:
+- Width: 196 px.
+- Height: 70 px.
+Label:
+
+All Status
+
+Contains a downward chevron.
+
+It should offer the available status filters, including:
+- All Status
+- Healthy
+- Attention
+- Critical
+The dropdown should visually match the previous dropdown.
+5.4 Sort dropdown
+Approximate dimensions:
+- Width: 335 px.
+- Height: 70 px.
+Displayed label:
+
+Sort by: Last Updated
+
+The words Sort by: are slightly less prominent than Last Updated.
+
+A downward-facing chevron sits toward the right edge.
+
+Possible options:
+- Last Updated
+- Farm Name
+- Area
+- Number of Fields
+- Alerts
+The dropdown must be aligned vertically with the search input and other filters.
+5.5 View selector
+This is a combined segmented control positioned on the far right.
+
+Approximate dimensions:
+- Width: 175 px.
+- Height: 70 px.
+- Border radius: 38 px.
+It contains two segments:
+
+
+
+First segment: List view
+- Bright green background.
+- Circular or pill-shaped highlighted region.
+- White/light icon.
+- Represents the currently selected state.
+Second segment: Grid view
+- Dark transparent background.
+- Light gray grid icon.
+- Represents the inactive state.
+The two icons should be centered within their respective segments.
+
+The entire selector has a subtle outer border.
+
+Clicking either segment switches the farm display between table/list and card/grid layouts.
+
+6. Main farm data table
+Primary content section
+This is the largest component on the page.
+
+It occupies nearly the entire horizontal width.
+
+Position:
+- Left margin: approximately 47 px.
+- Right margin: approximately 48 px.
+- Top position: approximately 560 px from the top of the screenshot.
+Approximate dimensions:
+- Width: 1858 px.
+- Height: 625 px.
+The table is enclosed in a large glassmorphic panel.
+6.1 Outer table container
+The table container has:
+- Large rounded corners.
+- Approximately 32 px corner radius.
+- Dark translucent green background.
+- Thin green-gray border.
+- Background blur.
+- Subtle green ambient illumination.
+- Very subtle inner highlight.
+Suggested CSS:
+.farms-table-container {
+    width: 100%;
+
+    border-radius: 32px;
+
+    overflow: hidden;
+
+    background: rgba(9, 31, 22, 0.67);
+
+    border: 1px solid rgba(139, 193, 158, 0.3);
+
+    backdrop-filter: blur(24px);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,0.07),
+        0 12px 40px rgba(0,0,0,0.2);
+}
+
+
+The photographic and decorative background remains faintly visible behind the glass surface.
+
+The table must not look like a conventional white spreadsheet.
+
+Its appearance should remain consistent with the surrounding dark glass interface.
+6.2 Table column structure
+The table contains nine columns.
+Column	Content
+1	Farm
+2	Location
+3	Area
+4	Fields
+5	Active Crop
+6	Status
+7	Last Updated
+8	Alerts
+9	Actions
+
+The header row is approximately 70 px high.
+
+Header text is:
+- White/light gray.
+- Approximately 21–22 px.
+- Medium to semibold weight.
+- Vertically centered.
+The table uses a fixed, deliberate column distribution.
+
+Suggested proportions:
+.farm-col    { width: 25%; }
+.location-col{ width: 10%; }
+.area-col    { width: 8%; }
+.fields-col  { width: 7%; }
+.crop-col    { width: 15%; }
+.status-col  { width: 12%; }
+.updated-col { width: 11%; }
+.alerts-col  { width: 7%; }
+.actions-col { width: 5%; }
+
+
+These proportions are starting points; the final implementation should tune them to match the screenshot's column positions.
+6.3 Table header
+The header begins inside the outer rounded container.
+
+The first heading, Farm, is aligned to the left.
+
+The other headings are distributed horizontally according to their respective columns.
+
+A thin horizontal separator appears below the header.
+
+The separator is a subtle translucent green-gray line, not a bright solid border.
+
+7. Farm table rows
+There are five visible farm records.
+
+Every row follows the same structure and visual rhythm.
+
+Approximate row height:
+
+- 103–104 px.
+
+Each row has a subtle bottom divider.
+
+There is no alternating white/gray zebra striping.
+
+The row background is transparent, allowing the outer glass background to show through.
+
+On hover, a row could receive a slightly brighter translucent green background.
+7.1 First row — Green Valley Farm
+
+
+
+
+
+
+
+
+
+
+Green Valley Farm
+
+Dubai, UAE
+
+Healthy
+
+Farm identity cell
+The first cell contains:
+- A rectangular farm thumbnail.
+- Farm name.
+- Small green verification badge.
+- Location underneath the name.
+Thumbnail dimensions:
+- Approximately 127 × 88 px.
+- Border radius: approximately 16 px.
+- object-fit: cover.
+The photograph shows a green agricultural landscape with fields, mountains, and a farmhouse.
+
+Farm name:
+
+Green Valley Farm
+
+Typography:
+- 25 px approximately.
+- Font weight: 600.
+- White.
+A small green square verification symbol with a white checkmark appears immediately after the farm name.
+
+Location:
+
+Dubai, UAE
+
+The location is displayed on a second line.
+
+It is accompanied by a small map-pin icon.
+
+Font size: approximately 20 px.
+
+Color: light gray.
+Remaining columns
+Column	Value
+Location	Dubai, UAE
+Area	320 ha
+Fields	5
+Active Crop	Corn
+Status	Healthy
+Last Updated	2h ago
+Alerts	1
+Actions	Three-dot menu
+
+Area:
+
+320 ha
+
+Fields:
+
+5
+
+Active crop:
+
+A corn illustration in green and yellow, followed by Corn.
+
+The crop icon is approximately 48–52 px.
+
+Status:
+
+A dark green pill containing:
+- Small bright green circular indicator.
+- Text Healthy.
+The pill has a dark green background and subtle green illumination.
+
+Last Updated:
+
+2h ago
+
+Alerts:
+
+A yellow bell icon followed by 1.
+
+Actions:
+
+A rounded dark button with a horizontal three-dot icon.
+7.2 Second row — Desert Oasis
+Farm name:
+
+Desert Oasis
+
+Location:
+
+Al Ain, UAE
+Column	Value
+Area	275 ha
+Fields	4
+Active Crop	Wheat
+Status	Healthy
+Last Updated	1d ago
+Alerts	0
+
+Thumbnail:
+
+An agricultural field photograph.
+
+Crop icon:
+
+Golden-yellow wheat stalk.
+
+The wheat symbol is positioned before the word Wheat.
+
+Status:
+
+Green Healthy pill.
+
+Alerts:
+
+Mint-green notification bell with a zero count.
+
+Actions:
+
+Dark rounded three-dot menu button.
+7.3 Third row — Palm Grove Farm
+Farm name:
+
+Palm Grove Farm
+
+Location:
+
+Dubai, UAE
+Column	Value
+Area	247 ha
+Fields	3
+Active Crop	Barley
+Status	Attention
+Last Updated	3d ago
+Alerts	2
+
+Thumbnail:
+
+Green agricultural farm landscape.
+
+Crop icon:
+
+Golden wheat/barley stalk.
+
+Status:
+Attention
+This is the only visible farm with a yellow attention status.
+
+The status badge contains:
+- Amber circular indicator.
+- Yellow text.
+- Dark translucent amber-green background.
+- Subtle amber glow.
+Alerts:
+
+Yellow bell icon.
+
+Count:
+
+2
+
+Actions:
+
+Three-dot dark rounded button.
+7.4 Fourth row — Skyline Farm
+Farm name:
+
+Skyline Farm
+
+Location:
+
+Sharjah, UAE
+Column	Value
+Area	190 ha
+Fields	3
+Active Crop	Soybean
+Status	Healthy
+Last Updated	2d ago
+Alerts	0
+
+Thumbnail:
+
+Green agricultural landscape with a distant mountain background.
+
+Crop icon:
+
+Bright green soybean/leaf symbol.
+
+Status:
+
+Healthy green pill.
+
+Alerts:
+
+Mint-green bell icon with zero count.
+
+Actions:
+
+Three-dot menu.
+7.5 Fifth row — Red Dune Farm
+Farm name:
+
+Red Dune Farm
+
+Location:
+
+Abu Dhabi, UAE
+Column	Value
+Area	410 ha
+Fields	6
+Active Crop	Wheat
+Status	Healthy
+Last Updated	1d ago
+Alerts	1
+
+Thumbnail:
+
+Green agricultural landscape with fields and a farmhouse.
+
+Crop icon:
+
+Golden wheat stalk.
+
+Status:
+
+Healthy.
+
+Alerts:
+
+Yellow notification bell with count 1.
+
+Actions:
+
+Three-dot menu.
+
+The fifth row ends close to the lower edge of the table container.
+
+8. Farm thumbnail imagery
+The farm thumbnails are visually important because they make the table feel like an agricultural management product rather than a generic database.
+
+Every thumbnail is:
+- Landscape-oriented.
+- Approximately 127 × 88 px.
+- Rounded at the corners.
+- Cropped consistently.
+- Rich in green tones.
+- Photographic rather than illustrated.
+The imagery depicts:
+- Large green cultivated fields.
+- Mountains in the background.
+- Agricultural buildings.
+- Farm plots.
+- Green valleys.
+- Crop rows.
+Although the five thumbnails look similar in the screenshot, they should ideally be separate photographs.
+
+Do not replace them with generic colored squares or simple icons.
+
+9. Status badge design system
+There are two visible status states.
+Healthy
+
+Healthy
+
+
+
+Styling:
+- Background: rgba(0, 105, 57, 0.28).
+- Text: #00DB87.
+- Indicator: #12F09B.
+- Rounded capsule.
+- Height: approximately 48 px.
+- Horizontal padding: 16–18 px.
+Attention
+
+Attention
+
+
+
+Styling:
+- Background: dark amber.
+- Text: #FFC02D.
+- Indicator: bright yellow.
+- Rounded capsule.
+- Height: approximately 48 px.
+These badges should communicate status immediately without overpowering the table.
+
+10. Alerts column
+The alerts column uses a bell icon followed by a numeric count.
+
+There are two visual variants.
+Alert present
+- Yellow bell icon.
+- Bright amber/yellow color.
+- Numerical count in matching yellow.
+- Slight glow.
+No alerts
+- Mint-green bell icon.
+- Muted green count.
+- No strong glow.
+The bell is approximately 30–32 px.
+
+The number is approximately 23 px.
+
+The icon and number should have approximately 10 px spacing.
+
+11. Action buttons
+Every table row has an action button at its far-right side.
+
+Approximate dimensions:
+- Width: 72 px.
+- Height: 62 px.
+- Border radius: 23 px.
+Appearance:
+- Dark green-gray background.
+- Subtle lighter border.
+- Slight transparency.
+- Centered horizontal three-dot icon.
+- Light gray dots.
+Suggested CSS:
+.row-actions {
+    width: 72px;
+    height: 62px;
+
+    border-radius: 23px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(27, 47, 40, 0.7);
+
+    border: 1px solid rgba(180, 220, 195, 0.08);
+
+    color: #E2EBE5;
+}
+
+
+When clicked, the button should open a contextual menu.
+
+Possible actions:
+- View Farm
+- Edit Farm
+- Manage Fields
+- View Reports
+- Delete Farm
+The menu should be a dark glass popover consistent with the rest of the interface.
+
+12. Typography system
+The screenshot uses a modern geometric sans-serif font.
+
+Recommended font: Inter.
+
+The typography should remain consistent across the interface.
+Element	Approximate size	Weight
+Main page title	65–68 px	700
+Page subtitle	25–26 px	400
+Add Farm button	25 px	650–700
+Statistics number	52 px	700
+Statistics label	23–24 px	400
+Statistics change	22–23 px	600
+Search placeholder	22–23 px	400
+Dropdown labels	21–23 px	500
+Table header	20–22 px	500–600
+Farm name	24–25 px	600
+Location	19–20 px	400
+Table values	22–23 px	450–500
+Status text	21–22 px	600
+
+Font smoothing should be enabled.
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+Avoid mixing multiple unrelated typefaces.
+
+13. Glassmorphism system
+The glass effect is a defining visual feature of this dashboard.
+
+It appears on:
+- Logo container.
+- Statistics cards.
+- Search input.
+- Filter controls.
+- View selector.
+- Table container.
+- Action buttons.
+- Status badges.
+The glassmorphism should have four main properties.
+
+1. Transparency
+
+The background image and gradient should remain faintly visible behind the component.
+
+2. Background blur
+
+Use backdrop-filter: blur() rather than applying blur directly to the content.
+
+3. Fine borders
+
+Borders should be thin and translucent, typically green-white or gray-green.
+
+4. Internal highlights
+
+Use inset shadows to simulate reflected light along the top and inner edges.
+
+A reusable glass class:
+.glass {
+    background: rgba(9, 32, 21, 0.55);
+
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+
+    border: 1px solid rgba(160, 220, 180, 0.16);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 10px 30px rgba(0,0,0,0.15);
+}
+
+
+Do not overuse extremely bright green borders.
+
+Most surfaces should remain dark and subtle.
+
+Bright green is reserved for important interactions, positive indicators, and active states.
+
+14. Complete color palette
+The following palette is suitable for reconstructing the screenshot.
+Design token	Hex value	Usage
+Background primary	#020B08	Main page
+Background secondary	#06180F	Background gradients
+Surface primary	#0A2017	Glass panels
+Surface secondary	#102B20	Controls
+Surface elevated	#152D23	Action buttons
+Border subtle	#294738	Component outlines
+Border green	#398B59	Highlighted outlines
+Primary green	#18D96D	Main actions
+Bright green	#43ED8B	Icons and indicators
+Lime green	#9DEB3B	Leaf graphics
+Text primary	#F2F7F4	Main typography
+Text secondary	#BBC9C1	Supporting typography
+Text muted	#8D9D94	Placeholder text
+Warning	#FFBD2E	Attention and alerts
+Warning dark	#49360A	Amber backgrounds
+Error	#FF5B43	Critical alerts
+
+
+15. Exact component hierarchy for implementation
+The following is the recommended DOM/component architecture.
+
+It separates layout, visual elements, and reusable components.
+Dashboard
+│
+├── BackgroundLayer
+│   ├── BaseGradient
+│   ├── FoliageImageLayer
+│   ├── AgriculturalImageLayer
+│   ├── GreenAmbientGlow
+│   └── DarkOverlay
+│
+└── DashboardContent
+    │
+    ├── PageHeader
+    │   ├── Branding
+    │   │   ├── BrandIconContainer
+    │   │   ├── BrandLeafIcon
+    │   │   └── PageHeading
+    │   │       ├── Title
+    │   │       └── Subtitle
+    │   │
+    │   └── AddFarmButton
+    │
+    ├── StatisticsSection
+    │   ├── StatCard
+    │   │   ├── BackgroundImage
+    │   │   ├── DarkImageOverlay
+    │   │   ├── FarmIcon
+    │   │   ├── StatisticValue
+    │   │   ├── StatisticLabel
+    │   │   └── ChangeIndicator
+    │   │
+    │   ├── StatCard
+    │   ├── StatCard
+    │   └── StatCard
+    │
+    ├── FarmToolbar
+    │   ├── SearchInput
+    │   ├── FarmFilter
+    │   ├── StatusFilter
+    │   ├── SortDropdown
+    │   └── ViewSwitcher
+    │       ├── ListViewButton
+    │       └── GridViewButton
+    │
+    └── FarmTableContainer
+        │
+        ├── FarmTable
+        │   ├── TableHeader
+        │   │   ├── Farm
+        │   │   ├── Location
+        │   │   ├── Area
+        │   │   ├── Fields
+        │   │   ├── ActiveCrop
+        │   │   ├── Status
+        │   │   ├── LastUpdated
+        │   │   ├── Alerts
+        │   │   └── Actions
+        │   │
+        │   └── FarmRows
+        │       ├── FarmRow
+        │       ├── FarmRow
+        │       ├── FarmRow
+        │       ├── FarmRow
+        │       └── FarmRow
+
+
+
+16. Required interactions and frontend behavior
+Although the screenshot is a static representation, the interface should be implemented as a functional application rather than a collection of decorative elements.
+Component	Expected functionality
+Add Farm	Opens farm creation form
+Search	Filters farms dynamically
+All Farms	Filters by farm grouping
+All Status	Filters by health status
+Sort	Changes table sorting
+List View	Displays the table
+Grid View	Displays farm cards
+Farm Name	Opens farm details
+Verification Badge	Displays verified state
+Status Badge	Displays farm health
+Alert Count	Opens farm alerts
+Three-dot Menu	Opens contextual actions
+Table Row	Can navigate to farm details
+
+Search behavior
+Search should match:
+- Farm name.
+- Location.
+- Active crop.
+- Farm status.
+Filtering should occur without a full page refresh.
+Sorting behavior
+Sorting should support:
+- Last updated.
+- Alphabetical farm name.
+- Largest area.
+- Smallest area.
+- Most fields.
+- Highest alert count.
+Grid view
+When grid view is selected, the table should be replaced by a responsive grid of farm cards.
+
+The grid cards should reuse the same dark glassmorphism visual system.
+
+17. Responsive implementation
+The screenshot is a desktop reference, but the implementation should not be hardcoded to one screen resolution.
+Large desktop: 1600 px and above
+- Four statistics cards in one row.
+- Full toolbar in one row.
+- Full-width table.
+- All nine table columns visible.
+Medium desktop: 1024–1599 px
+- Four cards if space permits, otherwise two columns.
+- Toolbar controls can wrap.
+- Table may use horizontal scrolling.
+Tablet: 768–1023 px
+- Statistics cards in a two-column grid.
+- Search input spans most of the available width.
+- Filters can move to a second toolbar row.
+- Table uses horizontal scrolling.
+Mobile: below 768 px
+- Header becomes vertically arranged.
+- Add Farm button remains accessible.
+- Statistics become a two-column or single-column layout.
+- Search occupies full width.
+- Filters become horizontally scrollable or collapsible.
+- Table can transform into individual farm cards.
+- Action menus remain accessible.
+Do not simply shrink the desktop table until its contents become unreadable.
+
+18. Important pixel-level visual details
+These details are particularly important for matching the reference.
+1. The page background must remain almost black, with green atmospheric illumination.
+2. The decorative foliage must be large, partially cropped, and positioned behind the UI.
+3. The page title must be significantly larger than every other heading.
+4. The logo must use a translucent rounded-square container.
+5. The Add Farm button must be the brightest interactive element in the header.
+6. All four statistics cards must have identical dimensions.
+7. Each statistic card must have a different agricultural photographic background.
+8. The cards must have a dark overlay so that the white text remains readable.
+9. The search input must be substantially wider than the dropdowns.
+10. All toolbar controls must have the same vertical height.
+11. The table must have a large rounded outer container.
+12. The table header must be separated from the data using a subtle horizontal line.
+13. The farm thumbnail must appear before the farm name.
+14. Farm names must be bold and locations must be displayed underneath.
+15. Crop illustrations must be visually distinct from the text labels.
+16. Healthy badges must use green.
+17. Attention badges must use amber.
+18. Alerts must use yellow when present and mint green when absent.
+19. Every row must have consistent height and vertical alignment.
+20. Every action button must have the same dimensions and corner radius.
+21. The interface must have no unnecessary white surfaces.
+22. Borders must be subtle rather than excessively bright.
+23. The glass effect must be visible without making the interface look foggy.
+24. Shadows should be soft, wide, and low-opacity.
+25. Icons should have consistent stroke weight and visual scale.
+
+19. Recommended implementation files
+For a clean implementation from scratch:
+farm-dashboard/
+│
+├── index.html
+│
+├── styles/
+│   ├── global.css
+│   ├── background.css
+│   ├── header.css
+│   ├── statistics.css
+│   ├── toolbar.css
+│   ├── table.css
+│   └── responsive.css
+│
+├── scripts/
+│   ├── app.js
+│   ├── farms.js
+│   ├── filters.js
+│   ├── sorting.js
+│   └── view-switcher.js
+│
+└── assets/
+    ├── backgrounds/
+    │   ├── foliage-background.webp
+    │   └── agricultural-background.webp
+    │
+    ├── statistics/
+    │   ├── farms.webp
+    │   ├── fields.webp
+    │   ├── area.webp
+    │   └── alerts.webp
+    │
+    ├── farms/
+    │   ├── green-valley.webp
+    │   ├── desert-oasis.webp
+    │   ├── palm-grove.webp
+    │   ├── skyline.webp
+    │   └── red-dune.webp
+    │
+    └── icons/
+        ├── leaf.svg
+        ├── farm.svg
+        ├── crops.svg
+        └── warning.svg
+
+
+20. Final visual reconstruction target
+
+
+
+
+
+
+
+
+ecomend.ai
+
+
+The final result should look like a professionally designed agricultural enterprise SaaS dashboard.
+
+The visual identity can be summarized as:
+- Background: Deep forest-green and black, with photographic foliage and subtle ambient illumination.
+- Branding: Large green leaf logo with translucent glass container.
+- Header: Bold white title and a luminous green primary action.
+- Statistics: Four horizontally aligned photographic glass cards.
+- Controls: Dark rounded capsule inputs and dropdowns.
+- Data display: Large translucent green-black table.
+- Typography: Clean, modern, high-contrast sans-serif.
+- Status indicators: Green for healthy, amber for attention.
+- Icons: Agricultural illustrations with consistent proportions.
+- Overall aesthetic: Premium, natural, modern, sophisticated, information-dense, and highly polished.
+One important implementation distinction: The screenshot provides the visual target, not the original source code. Consequently, the measurements, CSS values, and column proportions above are carefully estimated from the rendered reference. An exact pixel-for-pixel recreation would additionally require the original font files, background photographs, icon assets, and original layout measurements. The specification above gives a developer a detailed, reproducible starting point without pretending those original source assets are available.

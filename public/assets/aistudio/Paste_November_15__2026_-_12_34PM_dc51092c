@@ -1,0 +1,2034 @@
+EXTREME-DETAIL FRONTEND RECONSTRUCTION SPECIFICATION
+Green Valley Farm — Individual Field / Crop Intelligence Dashboard
+This screenshot depicts a premium agricultural intelligence dashboard showing the detailed operational, environmental, and biological condition of an individual crop field.
+
+Unlike a general farm overview, this page is specifically designed to answer one central question:
+
+How is the current crop growing, what conditions is it experiencing, and what actions should the farmer take today?
+
+The interface combines crop identification, growth-stage monitoring, planting information, weather analytics, irrigation calculations, soil analysis, recommended farming activities, risk alerts, and crop rotation information.
+
+The design uses a sophisticated dark emerald-green visual language with glassmorphism, photographic backgrounds, glowing green accents, agricultural imagery, and dense but organized information panels.
+
+Below is a component-by-component reconstruction specification intended to allow a developer to recreate the interface from scratch using HTML, CSS, JavaScript, and suitable image assets.
+
+1. Overall canvas and page composition
+Reference resolution: 1720 × 1204 px
+The screenshot has a resolution of exactly:
+- Width: 1720 px.
+- Height: 1204 px.
+- Aspect ratio: approximately 1.43:1.
+- Format: RGBA.
+- Orientation: Landscape.
+The dashboard is a desktop-oriented interface with a very compact outer margin.
+
+Unlike a traditional dashboard with a sidebar, this design uses a full-width, card-based layout.
+
+There is no permanent navigation sidebar.
+
+There is no large conventional navigation header.
+
+Instead, the interface starts with a compact breadcrumb navigation and immediately presents the crop information.
+1.1 Overall component arrangement
+The page is composed of six major visual regions.
+A. Breadcrumb navigation
+
+Compact navigation at the top
+
+B. Crop overview / hero card
+
+Crop photograph · Crop identity · Planting data · Crop health
+
+C. Today's Growing Conditions
+
+Weather and forecast
+
+
+D. Water & Irrigation
+
+Water demand and soil moisture
+
+
+
+E. Soil & Crop Information
+
+
+F. Today's Actions
+
+
+Risks & Alerts
+
+Crop Rotation
+
+
+
+
+
+The layout follows a deliberate hierarchy:
+1. Identify the crop and its current health.
+2. Show the weather affecting it.
+3. Show how much water it needs.
+4. Explain the soil and crop characteristics.
+5. Tell the farmer what to do.
+6. Warn the farmer about potential problems.
+This hierarchy is essential to reproducing the design.
+
+2. Global background and atmospheric environment
+The entire dashboard sits on a nearly black forest-green background.
+
+The background is not flat. It contains large, blurred, photographic foliage textures and subtle green light effects.
+2.1 Base background
+The dominant background color is an extremely dark green-black.
+
+Suggested colors:
+Token	Hex	Purpose
+Background darkest	#020C08	Main canvas
+Background primary	#03160E	General background
+Background secondary	#062417	Atmospheric green
+Forest green	#0A321E	Foliage illumination
+Deep emerald	#06452C	Subtle background glow
+Panel base	#06271B	Glass cards
+
+Suggested CSS:
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            ellipse at 45% 0%,
+            rgba(14, 112, 52, 0.22),
+            transparent 45%
+        ),
+        radial-gradient(
+            ellipse at 100% 60%,
+            rgba(0, 92, 55, 0.15),
+            transparent 40%
+        ),
+        linear-gradient(
+            135deg,
+            #04170E,
+            #020B07 60%,
+            #03180F
+        );
+
+    color: #F1F7F3;
+
+    font-family: Inter, sans-serif;
+}
+
+
+2.2 Decorative foliage background
+Across the upper part of the screenshot, large green leaves and foliage are visible behind the content.
+
+These decorative elements are:
+- Extremely wide.
+- Partially transparent.
+- Blurred in places.
+- Darkened significantly.
+- Positioned behind the cards.
+The leaves are most noticeable in the upper center and upper-right areas.
+
+There is also a subtle green illumination along the lower and right portions of the interface.
+
+Use an absolute-positioned image layer:
+.background-foliage {
+    position: fixed;
+    inset: 0;
+
+    z-index: -1;
+
+    background-image:
+        linear-gradient(
+            rgba(0, 15, 8, 0.65),
+            rgba(0, 15, 8, 0.82)
+        ),
+        url("/assets/foliage-background.webp");
+
+    background-size: cover;
+    background-position: center;
+
+    pointer-events: none;
+}
+
+
+Important: The foliage should not compete with the text. It exists to establish the agricultural visual identity.
+
+3. Breadcrumb navigation
+
+
+
+
+
+
+
+
+tailwindcss.com
+
+
+The breadcrumb is located at the extreme top-left of the interface.
+
+Approximate position:
+- Left: 14 px.
+- Top: 27 px.
+- Height: 20–25 px.
+It consists of four visual elements:
+1. Back arrow.
+2. My Farms.
+3. Green Valley Farm.
+4. Field 03.
+The exact text:
+
+← My Farms  ›  Green Valley Farm  ›  Field 03
+3.1 Individual elements
+Back arrow
+A small left-facing arrow.
+- Size: approximately 18 px.
+- Color: muted white.
+- Stroke: approximately 2 px.
+My Farms
+- Font size: 16 px.
+- Weight: 400–500.
+- Color: #D8E2DB.
+Separator
+A small right-facing chevron.
+- Size: approximately 13 px.
+- Color: muted gray-green.
+Green Valley Farm
+- Font size: 16 px.
+- Weight: 400.
+- Color: light gray.
+Field 03
+- Font size: 16 px.
+- Weight: 400.
+- Color: light gray.
+The entire breadcrumb sits directly on the page background.
+
+There is no enclosing pill, card, or navigation bar.
+Functional behavior
+- Clicking My Farms returns to the farm overview.
+- Clicking Green Valley Farm opens the farm-level overview.
+- Field 03 indicates the current selected field.
+
+4. Main crop overview hero card
+Primary visual component
+
+
+
+
+
+
+
+
+
+
+This is the largest card in the upper portion of the dashboard.
+
+It begins immediately below the breadcrumb.
+
+Approximate position:
+- X: 10 px.
+- Y: 55 px.
+- Width: 1688 px.
+- Height: 303 px.
+It spans almost the entire viewport width.
+
+Its border radius is approximately 22 px.
+
+Its border is thin and muted green.
+
+Its background is a combination of photographic maize imagery and dark translucent green overlays.
+4.1 Hero card structural composition
+The card has four main horizontal sections.
+Crop photograph
+Image region
+
+Crop identity
+Name and growth stage
+
+Planting data
+Dates and maturity
+
+Crop health
+Health assessment
+
+
+Conceptual four-region division of the hero component.
+The sections are visually separated by subtle vertical borders.
+
+The first section uses an image, while the remaining sections use translucent dark-green surfaces.
+4.2 Section one: Crop photograph
+Approximate position:
+- X: 11 px.
+- Y: 57 px.
+- Width: 407 px.
+- Height: 300 px.
+The image fills the entire first region.
+
+The photograph depicts a healthy maize field.
+
+Visible details:
+- Tall green corn plants.
+- Long, narrow leaves.
+- Dense vegetation.
+- Multiple corn stalks.
+- Bright blue sky.
+- Natural sunlight.
+- Lush green foliage.
+The image is cropped so that the plants fill most of the visible area.
+
+The left corners of the image follow the outer hero card's rounded corners.
+
+The image must use:
+.crop-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+}
+
+
+The right edge of the photograph transitions into the dark-green hero content through a gradient overlay.
+
+For example:
+.crop-image-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        90deg,
+        transparent 55%,
+        rgba(3, 27, 16, 0.35) 80%,
+        #052418 100%
+    );
+}
+
+
+The image must not look like a small thumbnail. It is a large, immersive crop photograph.
+4.3 Section two: Crop identity and growth information
+This section occupies approximately 355 px horizontally.
+
+It starts around X = 435 px.
+
+Its content is left-aligned.
+Active badge
+At the top:
+Active
+The badge is a small, bright-green rounded capsule.
+
+Approximate dimensions:
+- Width: 72 px.
+- Height: 29 px.
+Appearance:
+- Background: #12CE64.
+- Text: dark green.
+- Font size: 14–15 px.
+- Weight: 600.
+- Fully rounded edges.
+Crop name
+Displayed text:
+Maize
+This is the main heading in the hero section.
+
+Typography:
+- Approximately 42–44 px.
+- Font weight: 700.
+- Color: #F3F8F4.
+- Letter spacing: approximately -1 px.
+It sits below the Active badge.
+Crop variety
+Text:
+
+Pioneer P0725
+
+Typography:
+- Approximately 22 px.
+- Weight: 500.
+- Color: white.
+The variety appears immediately below the crop name.
+Field location and area
+Text:
+
+📍 Field 03 – North Block · 74.5 ha
+
+This line contains:
+- Map-pin icon.
+- Field number.
+- Field/block name.
+- Small separator dot.
+- Field area.
+Styling:
+- Font size: approximately 18 px.
+- Color: #C6D4CA.
+- Icon: muted mint green.
+Horizontal separator
+A thin green-gray line separates the identity information from the growth-stage information.
+
+It extends across most of the section width.
+
+Color:
+
+rgba(160, 205, 170, 0.19)
+
+Thickness:
+
+1 px.
+Growth stage section
+Below the separator, a large green crop-leaf illustration appears on the left.
+
+To the right:
+
+Growth Stage
+
+Then:
+
+Mid-Vegetative
+
+Typography:
+- Label: approximately 16 px.
+- Main value: approximately 21 px.
+- Main value weight: 650.
+- Color: near-white.
+The leaf icon is approximately 62 × 60 px.
+
+It is a stylized green plant with three or more leaves.
+Growth progress bar
+Under the growth-stage text is a horizontal progress bar.
+
+Approximate dimensions:
+- Width: 308 px.
+- Height: 11 px.
+- Border radius: 10 px.
+Background:
+
+#29473A
+
+Progress fill:
+
+#13D879
+
+The progress fill occupies approximately 45% of the total bar.
+
+Under the bar, aligned to the right:
+
+~ 45% Complete
+
+Typography:
+- Font size: 13 px.
+- Color: light gray.
+- Weight: 400.
+The progress bar should have a slight green glow.
+
+Suggested CSS:
+.growth-progress {
+    width: 100%;
+    height: 11px;
+
+    border-radius: 20px;
+
+    background: #29483A;
+    overflow: hidden;
+}
+
+.growth-progress-fill {
+    width: 45%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    background: linear-gradient(
+        90deg,
+        #08BC66,
+        #36ED96
+    );
+
+    box-shadow: 0 0 12px rgba(29, 229, 126, 0.4);
+}
+
+
+
+5. Planting and crop lifecycle information
+The third hero region is dedicated to crop lifecycle metrics.
+
+Approximate width: 328 px.
+
+It begins around X = 775 px.
+
+A thin vertical divider separates it from the crop identity section.
+
+This region contains four stacked informational rows.
+
+Each row has:
+- An icon at the left.
+- A text label.
+- A value underneath.
+5.1 Planted On
+Icon: calendar.
+
+Label:
+
+Planted On
+
+Value:
+
+12 Sep 2026
+
+The calendar icon is a pale gray-green.
+
+Approximate dimensions: 26 px.
+
+Text:
+- Label: 17 px.
+- Value: 18 px.
+- Value weight: 600.
+5.2 Days Since Planting
+Icon: clock.
+
+Label:
+
+Days Since Planting
+
+Value:
+
+28 Days
+
+The clock is a circular outline icon.
+5.3 Estimated Maturity
+Icon: hourglass.
+
+Label:
+
+Est. Maturity
+
+Value:
+
+~ 95 Days
+
+The hourglass icon should be consistent with the previous icons.
+5.4 Harvest Window
+Icon: calendar with agricultural/harvest indicator.
+
+Label:
+
+Harvest Window
+
+Value:
+
+15 Jan – 25 Jan
+
+The rows have consistent vertical spacing.
+
+Approximate gap between rows: 17–22 px.
+
+The entire section is vertically centered inside the hero card.
+
+6. Crop Health panel
+The final hero region occupies approximately 340 px.
+
+It starts at around X = 1100 px.
+
+Unlike the other hero regions, it is presented as a clearly defined translucent card-like area.
+
+Its background is a slightly brighter green-black surface.
+
+It has:
+- Rounded upper corners.
+- A thin green border.
+- Dark glass effect.
+- A decorative leaf image in the bottom-right corner.
+6.1 Panel heading
+Heading:
+
+Crop Health
+
+Approximate font size: 23 px.
+
+Weight: 650.
+
+Color: white.
+
+Positioned at the upper-left of the panel.
+6.2 Health badge
+At the upper-right:
+Healthy
+The badge consists of:
+- Circular bright-green background.
+- Dark checkmark.
+- Green text Healthy.
+The circular checkmark is approximately 33 px.
+
+The text is approximately 18 px and semibold.
+6.3 Health description
+Text:
+
+"Your maize crop is progressing well at the mid-vegetative stage. Conditions are favourable for continued growth."
+
+The text is divided into approximately four lines.
+
+Typography:
+- Font size: 17 px.
+- Weight: 400.
+- Line height: 1.5.
+- Color: #DCE8E0.
+It begins approximately 29 px below the heading.
+6.4 Decorative foliage
+Large green leaves appear in the lower-right portion of the panel.
+
+The foliage is positioned behind the text and extends beyond the bottom boundary.
+
+It includes:
+- A broad green leaf.
+- A narrow upright leaf.
+- Darker green foliage behind them.
+This is decorative imagery and must not interfere with the paragraph.
+
+Use absolute positioning and a bottom gradient mask.
+
+7. Today's Growing Conditions — Weather panel
+Weather analytics
+
+
+
+
+
+
+
+
+dribbble.com
+
+
+This is the large card on the left side of the second dashboard row.
+
+Approximate position:
+- X: 10 px.
+- Y: 375 px.
+- Width: 619 px.
+- Height: 313 px.
+Border radius:
+
+Approximately 20 px.
+
+The card has a dark green translucent background, a subtle border, and a very slight green glow.
+7.1 Header
+Heading:
+
+Today's Growing Conditions
+
+Typography:
+- Font size: approximately 22 px.
+- Weight: 650.
+- Color: white.
+Position:
+- Left padding: approximately 23 px.
+- Top padding: approximately 16 px.
+Below it:
+
+Live • 10:24 AM
+
+The word Live is bright green.
+
+The timestamp is muted gray-green.
+
+Font size: approximately 14 px.
+
+A thin horizontal divider extends across the card below the header.
+7.2 Main weather section
+The upper content is divided into two columns.
+
+Left column: current weather.
+
+Right column: atmospheric measurements.
+Left column: Current weather
+Contains a large partly cloudy weather illustration.
+
+The illustration shows:
+- Yellow sun.
+- White clouds.
+- Pale gray cloud shadows.
+- Bright yellow sun rays.
+Approximate illustration dimensions:
+
+90 × 80 px.
+
+To the right:
+
+29°C
+
+Typography:
+- Approximately 37 px.
+- Weight: 700.
+- White.
+Below:
+
+Partly Cloudy
+
+Font size: 14–15 px.
+
+The icon and temperature are horizontally aligned.
+Right column: Weather measurements
+A subtle vertical divider separates the current weather from the measurements.
+
+The following values are displayed:
+Metric	Value
+Minimum temperature	22°C
+Maximum temperature	32°C
+Humidity	62%
+Wind	12 km/h NE
+Rain (24h)	0 mm
+
+The first line is:
+
+Min 22°C  |  Max 32°C
+
+The remaining information is displayed on individual lines.
+
+Font size: approximately 16–17 px.
+
+Line spacing: approximately 31 px.
+
+Labels and values use light gray/white.
+7.3 Temperature chart
+The lower-left portion contains a temperature curve.
+
+The chart spans approximately 400 px horizontally.
+
+It is a custom line chart rather than a traditional boxed chart.
+Chart background
+Transparent.
+
+No external card.
+Axes
+Vertical axis:
+- 40° at the top.
+- 20° in the middle.
+- 20° shown near the bottom in the screenshot, apparently intended to be a lower-temperature tick label.
+Horizontal axis:
+- 6AM.
+- 12PM.
+- 6PM.
+There are thin gray axis lines.
+
+Horizontal and vertical grid lines are very subtle.
+Temperature line
+The line is bright amber/yellow.
+
+Color:
+
+#FFC12D
+
+Thickness:
+
+Approximately 3 px.
+
+The line follows a smooth curve.
+
+It starts around 14° at 6AM, increases throughout the morning, reaches a maximum around midday, and gradually decreases toward the evening.
+
+Small circular data markers appear along the curve.
+
+The midday marker is larger and has a white or pale-yellow center.
+
+Approximate data shape:
+const temperatureData = [
+  { time: "6AM", temp: 14 },
+  { time: "8AM", temp: 18 },
+  { time: "10AM", temp: 24 },
+  { time: "12PM", temp: 28 },
+  { time: "2PM", temp: 26 },
+  { time: "4PM", temp: 22 },
+  { time: "6PM", temp: 19 },
+  { time: "8PM", temp: 18 }
+];
+
+
+The chart should be rendered using SVG, Canvas, or a charting library.
+
+SVG is particularly suitable for reproducing the smooth line and custom marker styling.
+7.4 Next 3 Days mini forecast
+A separate mini-card overlaps the lower-right area of the weather panel.
+
+Approximate dimensions:
+- Width: 195 px.
+- Height: 180 px.
+It is positioned inside the weather card.
+
+Its top begins around Y = 534 px.
+
+The background is a darker green translucent surface.
+
+Border:
+
+Thin muted green.
+
+Radius:
+
+Approximately 17 px.
+
+Heading:
+
+Next 3 Days
+
+Typography:
+- 16 px.
+- Semibold.
+Three forecast rows:
+Day	Icon	Forecast
+Mon	Sun	31°/23°
+Tue	Sun	32°/24°
+Wed	Sun	33°/25°
+
+Each row contains:
+- Yellow sun icon.
+- Day abbreviation.
+- High/low temperature.
+Font size: approximately 15 px.
+
+Rows are vertically spaced approximately 32 px apart.
+
+8. Water & Irrigation panel
+Water management
+
+
+
+
+
+
+
+
+romeosilvestri.github.io
+
+
+This is the largest card in the second row.
+
+Approximate position:
+- X: 648 px.
+- Y: 375 px.
+- Width: 1050 px.
+- Height: 312 px.
+It is wider than the weather card.
+
+Its background is a dark emerald glass surface with a thin bright green border.
+
+The card is divided into two main areas:
+1. Water demand and rainfall metrics.
+2. Soil moisture gauge.
+8.1 Header
+At the top-left:
+
+A blue water droplet icon.
+
+Next to it:
+
+Water & Irrigation
+
+Typography:
+- Approximately 22 px.
+- Weight: 650.
+- White.
+At the top-right:
+
+View Details →
+
+The text is bright green.
+
+Font size: approximately 14 px.
+
+Weight: 600.
+
+The header has a thin horizontal separator underneath.
+8.2 Water metrics section
+The left area occupies approximately 68% of the card width.
+
+It contains three equal metric columns.
+Metric one: Crop Demand
+Icon:
+
+Blue water droplet.
+
+Value:
+
+5.8 mm/day
+
+Label:
+
+Crop Demand
+
+The value is approximately 19–20 px.
+
+The label is approximately 15 px.
+Metric two: Effective Rain
+Icon:
+
+Light blue rain cloud.
+
+Value:
+
+2.1 mm
+
+Label:
+
+Effective Rain
+
+Secondary description:
+
+(Last 7 days)
+Metric three: Irrigation Needed
+Icon:
+
+Green irrigation/sprinkler symbol.
+
+Value:
+
+3.0 mm
+
+Label:
+
+Irrigation Needed
+
+Secondary description:
+
+(Today)
+
+Each metric is horizontally centered.
+
+The icons appear above their numerical values.
+
+Thin vertical dividers separate the three columns.
+8.3 Recommendation panel
+Below the metrics is a wide green recommendation banner.
+
+Approximate dimensions:
+- Width: 520 px.
+- Height: 87 px.
+- Position: lower-left portion of the irrigation card.
+It has:
+- Rounded corners.
+- Dark green background.
+- Subtle bright green border.
+- Soft green internal glow.
+At the left is a bright green circular icon containing a dark checkmark.
+
+The recommendation text is:
+
+Recommended: Apply 3.0 mm today in 1 cycle
+
+Below:
+
+(~225 m³ for 74.5 ha) at 6:00 PM
+
+The main line is approximately 16 px.
+
+The second line is approximately 15 px.
+
+A subtle right-facing arrow appears near the right edge.
+
+This panel is visually emphasized because it represents a practical farming recommendation.
+8.4 Soil moisture gauge
+The right portion is separated from the water metrics by a vertical divider.
+
+At the center is a semicircular or nearly semicircular gauge.
+
+The gauge is approximately 140 px wide.
+
+It consists of:
+- Dark gray-green background arc.
+- Bright green progress arc.
+- Rounded arc endpoints.
+The value is:
+
+68%
+
+Typography:
+- Approximately 30 px.
+- Weight: 700.
+- White.
+The gauge represents the current soil moisture percentage.
+
+Below it:
+
+Soil Moisture
+
+Font size: approximately 20 px.
+
+Then:
+
+(Optimal)
+
+Font size: approximately 15 px.
+
+Color: muted light green.
+Gauge implementation
+Use SVG with a circular path and stroke-dasharray.
+
+Example:
+<svg viewBox="0 0 160 100">
+  <path
+    d="M 15 85 A 65 65 0 0 1 145 85"
+    fill="none"
+    stroke="#24463A"
+    stroke-width="13"
+    stroke-linecap="round"
+  />
+
+  <path
+    d="M 15 85 A 65 65 0 0 1 145 85"
+    fill="none"
+    stroke="#16D979"
+    stroke-width="13"
+    stroke-linecap="round"
+    stroke-dasharray="..."
+  />
+</svg>
+
+
+The actual arc should represent 68% of the available semicircular path.
+
+9. Soil & Crop Information panel
+Agronomic information
+
+
+
+
+
+
+
+
+digital.agrishow.com.br
+
+
+This is the bottom-left card.
+
+Approximate position:
+- X: 10 px.
+- Y: 706 px.
+- Width: 591 px.
+- Height: 286 px.
+Border radius:
+
+Approximately 20 px.
+
+Background:
+
+Dark translucent emerald green.
+
+Border:
+
+Subtle green.
+9.1 Header
+A small bright-green plant icon appears at the left.
+
+Heading:
+
+Soil & Crop Information
+
+Font size: approximately 20 px.
+
+Weight: 650.
+
+At the far right:
+
+View Details →
+
+Bright green.
+
+Font size: approximately 14 px.
+9.2 Soil image
+A large vertical photograph occupies the left portion.
+
+Approximate dimensions:
+- Width: 147 px.
+- Height: 203 px.
+Position:
+- Left padding: 21 px.
+- Top: approximately 767 px.
+Border radius:
+
+Approximately 13 px.
+
+The image depicts:
+- A thin layer of green vegetation at the top.
+- Exposed brown soil.
+- Dark rich loam.
+- Visible soil structure.
+- Small roots and organic material.
+- Different layers of soil texture.
+The image should use object-fit: cover.
+
+It is not a decorative background; it is a distinct visual information element.
+9.3 Soil measurements
+The right side of the image contains two vertical information groups.
+
+They are separated by a thin vertical divider.
+First column
+Contains four measurements.
+
+Soil Texture
+
+Loam
+
+pH
+
+6.8
+
+Organic Matter
+
+2.1%
+
+Available Water
+
+145 mm
+
+Each metric follows the same format:
+- Label above.
+- Value underneath.
+- Approximately 15–16 px.
+- White/light gray.
+- Moderate line spacing.
+Second column
+Contains two measurements.
+
+Crop Water Coefficient (Kc)
+
+1.15
+
+Total Available Water (TAW)
+
+180 mm
+
+The values are displayed in a slightly larger font.
+
+1.15 is particularly prominent.
+
+The second column starts after a vertical divider.
+
+The divider has a subtle green-gray color.
+
+10. What You Need to Do Today — Action panel
+Action recommendations
+
+
+
+
+
+
+
+
+wabtech.gumroad.com
+
+
+This is the middle card in the bottom row.
+
+Approximate position:
+- X: 620 px.
+- Y: 705 px.
+- Width: 411 px.
+- Height: 302 px.
+It has rounded corners and a dark green translucent background.
+
+The card is slightly taller than the Soil & Crop Information card.
+10.1 Header
+A bright-green clipboard/checklist icon.
+
+Heading:
+
+What You Need to Do Today
+
+Font size:
+
+Approximately 19 px.
+
+Weight:
+
+650.
+
+Color:
+
+White.
+10.2 Action one: Irrigation
+Icon:
+
+Blue water droplet.
+
+Primary text:
+
+Irrigate: 3.0 mm total
+
+Secondary text:
+
+(1 cycle ~225 m³ at 6 PM)
+
+Priority badge:
+High
+The priority badge is located at the right.
+
+Its background is dark green.
+
+Its text is bright green.
+10.3 Action two: Pest inspection
+Icon:
+
+Yellow/orange leaf or pest-related symbol.
+
+Primary text:
+
+Check for potential pests
+
+Secondary text:
+
+(leaf miners)
+
+Priority:
+Medium
+The badge has an amber background and yellow text.
+10.4 Action three: Fertilizer
+Icon:
+
+Pale green fertilizer/agricultural symbol.
+
+Primary text:
+
+Apply urea fertiliser
+
+Secondary text:
+
+(40 kg/ha if needed)
+
+Priority:
+Low
+The badge uses a muted gray-green background.
+10.5 Action row styling
+Each action row contains:
+- Icon at the left.
+- Text in the center.
+- Priority badge at the right.
+The rows are vertically stacked.
+
+Approximate vertical spacing:
+
+20–25 px.
+
+The text uses approximately 15–16 px.
+
+The icons are approximately 22–25 px.
+10.6 Primary action button
+At the bottom is a bright green full-width button.
+
+Text:
+
+View Full Action Plan →
+
+Approximate dimensions:
+- Width: 364 px.
+- Height: 44 px.
+Background:
+
+Green gradient.
+.action-plan-button {
+    width: 100%;
+    height: 44px;
+
+    border: none;
+    border-radius: 13px;
+
+    background: linear-gradient(
+        100deg,
+        #17D85D,
+        #08B957
+    );
+
+    color: #032012;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+The button is the most prominent interactive element in this card.
+
+11. Risks & Alerts panel
+Risk monitoring
+This card is positioned in the upper-right portion of the bottom row.
+
+Approximate position:
+- X: 1052 px.
+- Y: 705 px.
+- Width: 390 px.
+- Height: 199 px.
+It is a compact card with a dark green background.
+11.1 Header
+At the left is a red triangular warning icon.
+
+Heading:
+
+Risks & Alerts
+
+Font size:
+
+Approximately 19 px.
+
+Weight:
+
+650.
+
+At the far right:
+
+View All →
+
+Bright green.
+
+Font size:
+
+14 px.
+11.2 Alert one: Heat Stress Risk
+The alert row contains a dark amber square icon container.
+
+Inside it:
+
+A bright yellow warning symbol.
+
+Text:
+
+Heat Stress Risk
+
+Secondary status:
+
+High · Next 2 days
+
+Description:
+
+Investigate field shading and consider irrigation.
+
+Timestamp:
+
+2h ago
+
+The title is yellow-orange.
+
+The secondary status is pale gray.
+
+The description is muted white-gray.
+
+The timestamp is aligned to the far-right.
+11.3 Alert two: Water Stress Watch
+A similar amber icon container.
+
+Icon:
+
+Yellow water-related warning symbol.
+
+Text:
+
+Water Stress Watch
+
+Secondary status:
+
+Moderate
+
+Description:
+
+Monitor soil moisture closely.
+
+Timestamp:
+
+4h ago
+
+A subtle horizontal divider separates the two alerts.
+11.4 Alert styling
+The alert rows should have:
+- A compact vertical arrangement.
+- Small icon containers.
+- Strong title hierarchy.
+- Distinct timestamps.
+- Very subtle separators.
+The card should feel information-dense without looking crowded.
+
+12. Crop Rotation Overview panel
+This is the smallest card in the screenshot.
+
+Approximate position:
+- X: 1053 px.
+- Y: 917 px.
+- Width: 390 px.
+- Height: 89 px.
+It sits directly underneath the Risks & Alerts panel.
+
+It has a dark translucent green background, subtle border, and rounded corners.
+12.1 Header
+At the left:
+
+Bright green circular-arrows icon.
+
+Heading:
+
+Crop Rotation Overview
+
+Font size:
+
+Approximately 15 px.
+
+Weight:
+
+600.
+12.2 Rotation sequence
+The lower section contains three stages arranged horizontally.
+Previous
+
+Wheat
+
+Current
+
+Maize
+
+Next
+
+Soybean
+
+
+
+The three stages are:
+
+Previous
+
+Wheat
+
+Current
+
+Maize
+
+Next
+
+Soybean
+
+The current crop is emphasized using a darker green highlighted container.
+
+The arrows are bright green.
+
+The Previous and Next stages remain on transparent backgrounds.
+
+The component communicates crop rotation progression in a compact horizontal timeline.
+
+13. Complete visual design system
+This interface uses a consistent design system across all cards.
+13.1 Color palette
+Color token	Hex value	Usage
+--bg-main	#020C08	Page background
+--bg-dark	#04160D	Background gradient
+--surface	#08271B	Main cards
+--surface-light	#103B29	Elevated cards
+--surface-hover	#164632	Hover surfaces
+--border	#285640	Card borders
+--border-light	#36744C	Highlighted borders
+--green-primary	#13D66B	Main actions
+--green-bright	#35ED91	Active indicators
+--green-muted	#8BCF9C	Supporting accents
+--text-primary	#F1F7F3	Main typography
+--text-secondary	#C3D3C8	Supporting text
+--text-muted	#8EA99A	Secondary labels
+--warning	#FFBE32	Risks
+--warning-dark	#49360A	Warning surfaces
+--danger	#FF4545	Critical alerts
+--water	#38BFEF	Water indicators
+--soil	#A97843	Soil imagery
+
+13.2 Typography
+Recommended font:
+
+Inter
+
+Alternative: Manrope.
+
+The screenshot uses a modern, clean sans-serif type system.
+Element	Font size	Weight
+Maize heading	43 px	700
+Hero variety	22 px	500
+Hero field location	18 px	400
+Growth stage	21 px	650
+Panel heading	20–22 px	650
+Weather temperature	37 px	700
+Irrigation values	19–20 px	650
+Soil measurements	15–17 px	400–600
+Action text	15–16 px	500
+Supporting descriptions	14–17 px	400
+Breadcrumb	16 px	400
+Status badges	14–16 px	600
+
+The font sizes above are intended for the original screenshot resolution.
+13.3 Border radius system
+Component	Radius
+Hero card	22 px
+Main dashboard panels	19–21 px
+Small forecast card	17 px
+Alert card	18 px
+Action button	13 px
+Progress bar	20 px
+Status badge	30 px
+Small icon container	10–13 px
+
+
+14. Glassmorphism and surface treatments
+The glassmorphism is not identical across every component.
+
+The main hero card has a photographic background.
+
+The weather card has a relatively dark green surface.
+
+The irrigation card has a brighter emerald tint.
+
+The soil card uses a dark glass surface.
+
+The alerts card uses a darker, more muted appearance.
+
+All of them share the same underlying visual language.
+Reusable glass CSS
+.glass-panel {
+    position: relative;
+
+    background: rgba(5, 40, 26, 0.72);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border: 1px solid rgba(120, 204, 146, 0.26);
+
+    border-radius: 20px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 8px 25px rgba(0,0,0,0.16);
+}
+
+
+Green illumination
+Use soft radial gradients behind the main panels.
+.green-glow {
+    box-shadow:
+        0 0 25px rgba(0, 192, 89, 0.08),
+        inset 0 0 20px rgba(0, 160, 82, 0.05);
+}
+
+
+Important rendering rule
+Avoid making all cards equally bright.
+
+The interface relies on varying levels of darkness to establish visual hierarchy.
+
+The crop photograph and green irrigation card are among the more prominent visual regions.
+
+The alert and rotation cards are more subdued.
+
+15. Exact layout and positioning architecture
+The screenshot uses a dense dashboard grid.
+
+A suitable implementation should use CSS Grid rather than manually positioning every card.
+15.1 Main page layout
+.dashboard {
+    width: 100%;
+    min-height: 100vh;
+
+    padding: 8px 10px 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+
+15.2 Hero section
+.crop-hero {
+    width: 100%;
+    height: 303px;
+
+    display: grid;
+
+    grid-template-columns:
+        24.1%
+        21.0%
+        19.4%
+        35.5%;
+
+    overflow: hidden;
+
+    border-radius: 22px;
+}
+
+
+The four regions represent:
+1. Photograph.
+2. Crop identity.
+3. Lifecycle data.
+4. Crop health.
+The precise internal widths should be tuned to the screenshot.
+15.3 Middle row
+.middle-grid {
+    display: grid;
+
+    grid-template-columns:
+        619fr
+        1050fr;
+
+    gap: 19px;
+
+    height: 313px;
+}
+
+
+This creates:
+- Weather card on the left.
+- Irrigation card on the right.
+15.4 Bottom row
+.bottom-grid {
+    display: grid;
+
+    grid-template-columns:
+        591fr
+        411fr
+        390fr;
+
+    gap: 19px;
+
+    min-height: 302px;
+}
+
+
+The rightmost column is itself a nested grid:
+.right-column {
+    display: grid;
+
+    grid-template-rows:
+        199px
+        89px;
+
+    gap: 13px;
+}
+
+
+This reproduces the relationship between the Risks & Alerts card and Crop Rotation card.
+
+16. Complete DOM/component hierarchy
+A clean, maintainable frontend should use reusable components.
+
+The recommended structure is:
+CropDashboard
+│
+├── Background
+│   ├── BackgroundGradient
+│   ├── FoliageImage
+│   └── AmbientGlow
+│
+├── BreadcrumbNavigation
+│   ├── BackButton
+│   ├── MyFarmsLink
+│   ├── Separator
+│   ├── FarmLink
+│   ├── Separator
+│   └── CurrentField
+│
+├── CropOverviewHero
+│   │
+│   ├── CropPhotograph
+│   │   ├── MaizeImage
+│   │   └── ImageGradient
+│   │
+│   ├── CropIdentity
+│   │   ├── ActiveBadge
+│   │   ├── CropName
+│   │   ├── CropVariety
+│   │   ├── FieldLocation
+│   │   ├── Divider
+│   │   ├── GrowthStage
+│   │   ├── GrowthProgressBar
+│   │   └── CompletionPercentage
+│   │
+│   ├── CropLifecycle
+│   │   ├── PlantingDate
+│   │   ├── DaysSincePlanting
+│   │   ├── EstimatedMaturity
+│   │   └── HarvestWindow
+│   │
+│   └── CropHealth
+│       ├── HealthHeading
+│       ├── HealthBadge
+│       ├── HealthDescription
+│       └── DecorativeLeaves
+│
+├── MiddleDashboardGrid
+│   │
+│   ├── GrowingConditions
+│   │   ├── WeatherHeader
+│   │   ├── CurrentWeather
+│   │   ├── WeatherMetrics
+│   │   ├── TemperatureChart
+│   │   └── ThreeDayForecast
+│   │
+│   └── WaterIrrigation
+│       ├── IrrigationHeader
+│       ├── CropDemand
+│       ├── EffectiveRain
+│       ├── IrrigationNeeded
+│       ├── IrrigationRecommendation
+│       └── SoilMoistureGauge
+│
+└── BottomDashboardGrid
+    │
+    ├── SoilCropInformation
+    │   ├── SoilHeader
+    │   ├── SoilImage
+    │   ├── SoilTexture
+    │   ├── SoilPH
+    │   ├── OrganicMatter
+    │   ├── AvailableWater
+    │   ├── CropWaterCoefficient
+    │   └── TotalAvailableWater
+    │
+    ├── DailyActionPlan
+    │   ├── ActionHeader
+    │   ├── IrrigationAction
+    │   ├── PestInspectionAction
+    │   ├── FertilizerAction
+    │   └── ViewActionPlanButton
+    │
+    └── RightDashboardColumn
+        │
+        ├── RisksAlerts
+        │   ├── AlertHeader
+        │   ├── HeatStressAlert
+        │   └── WaterStressAlert
+        │
+        └── CropRotation
+            ├── RotationHeader
+            ├── PreviousCrop
+            ├── CurrentCrop
+            └── NextCrop
+
+
+
+17. Required interactions and functionality
+The interface should not be a static visual replica.
+
+Each interactive element should perform a meaningful action.
+Element	Expected functionality
+Back arrow	Return to previous page
+My Farms	Navigate to farm overview
+Green Valley Farm	Navigate to farm details
+Field 03	Current field selection
+Active badge	Display crop activity status
+Growth progress	Reflect crop development data
+Crop Health	Open detailed health report
+Weather chart	Show temperature data
+Next 3 Days	Display forecast information
+Water & Irrigation	Open irrigation details
+Irrigation recommendation	Open irrigation scheduling
+Soil Details	Open soil analysis
+Action Plan	Open full task list
+Priority badges	Indicate task priority
+Risks & Alerts	Open full risk report
+Crop Rotation	Open rotation history
+
+17.1 Dynamic data
+All displayed data should come from a structured JavaScript object or backend API.
+
+For example:
+const cropData = {
+    crop: "Maize",
+    variety: "Pioneer P0725",
+
+    field: {
+        id: "Field 03",
+        block: "North Block",
+        area: 74.5
+    },
+
+    status: "Active",
+
+    growth: {
+        stage: "Mid-Vegetative",
+        completion: 45
+    },
+
+    planting: {
+        date: "2026-09-12",
+        daysSincePlanting: 28,
+        estimatedMaturity: 95,
+        harvestStart: "2027-01-15",
+        harvestEnd: "2027-01-25"
+    },
+
+    health: {
+        status: "Healthy",
+        description:
+            "Your maize crop is progressing well at the mid-vegetative stage."
+    },
+
+    weather: {
+        temperature: 29,
+        condition: "Partly Cloudy",
+        humidity: 62,
+        wind: "12 km/h NE",
+        rain24h: 0
+    },
+
+    irrigation: {
+        cropDemand: 5.8,
+        effectiveRain: 2.1,
+        irrigationNeeded: 3.0,
+        soilMoisture: 68
+    },
+
+    soil: {
+        texture: "Loam",
+        ph: 6.8,
+        organicMatter: 2.1,
+        availableWater: 145,
+        kc: 1.15,
+        taw: 180
+    }
+};
+
+
+The values above reproduce the information displayed in the screenshot.
+
+For a production application, calculated recommendations and measurements should be supplied by the appropriate agronomic/backend logic rather than hardcoded.
+
+18. Responsive behavior
+The reference is a desktop dashboard, but the design should adapt to different viewports.
+Desktop — 1440 px and above
+- Hero card spans full width.
+- Four hero regions remain horizontal.
+- Weather and irrigation panels sit side by side.
+- Bottom section uses three columns.
+- All content is visible without horizontal scrolling.
+Laptop — 1024–1439 px
+- Hero sections remain horizontal if sufficient width exists.
+- Weather and irrigation panels remain side by side where practical.
+- Bottom cards can use a slightly adjusted three-column grid.
+- Some supporting text may wrap.
+Tablet — 768–1023 px
+- Hero card can become two rows.
+- Crop photograph and identity occupy the first row.
+- Lifecycle and health information occupy the second.
+- Weather and irrigation cards can stack.
+- Bottom panels use two columns.
+Mobile — below 768 px
+- Breadcrumb becomes compact.
+- Hero becomes a vertical card.
+- Crop photograph appears at the top.
+- Crop identity follows.
+- Lifecycle data becomes a two-column metric grid.
+- Health becomes a separate section.
+- Weather occupies full width.
+- Irrigation occupies full width.
+- Soil information becomes vertical.
+- Action plan occupies full width.
+- Alerts and crop rotation stack vertically.
+Do not force the original desktop dimensions onto mobile.
+
+19. Image asset requirements
+To recreate this screenshot convincingly, the following image assets are necessary.
+
+
+
+
+
+
+
+
+
+
+1. Main maize field photograph
+Hero card's primary crop photograph.
+
+
+
+
+
+
+
+
+
+
+2. Background foliage
+Decorative global background.
+
+
+
+
+
+
+
+
+
+
+3. Soil profile
+Soil and crop information card.
+
+
+
+
+
+
+
+
+
+
+4. Decorative leaf
+Crop health panel bottom-right foliage.
+
+Recommended asset formats:
+- WebP for photographs.
+- SVG for custom agricultural icons.
+- PNG for transparent illustrations where SVG is unavailable.
+Icons required
+A consistent icon family such as Lucide can provide:
+- Arrow-left.
+- Chevron-right.
+- Map-pin.
+- Calendar-days.
+- Clock.
+- Hourglass.
+- Shield-check.
+- Check-circle.
+- Sun.
+- Cloud-sun.
+- Cloud-rain.
+- Droplet.
+- Sprout.
+- Clipboard-check.
+- Alert-triangle.
+- Refresh-cw.
+- Arrow-right.
+Some agricultural symbols, such as maize, irrigation sprinklers, and crop-specific illustrations, should use custom SVG artwork rather than generic icons.
+
+20. Final pixel-accuracy checklist
+When implementing this dashboard, these are the details that will have the greatest effect on the similarity to the reference.
+Overall layout
+- [ ] Use the 1720 × 1204 reference proportions.
+- [ ] Maintain approximately 10 px outer horizontal margins.
+- [ ] Keep the breadcrumb compact.
+- [ ] Make the crop overview card span nearly the entire viewport width.
+- [ ] Use a two-column middle section.
+- [ ] Use a three-column bottom section.
+- [ ] Keep the alert and rotation cards stacked in the right column.
+Hero card
+- [ ] Large maize photograph on the left.
+- [ ] Active badge above the crop name.
+- [ ] Large Maize heading.
+- [ ] Variety immediately underneath.
+- [ ] Field location and area.
+- [ ] Growth-stage leaf icon.
+- [ ] 45% progress bar.
+- [ ] Four planting/lifecycle metrics.
+- [ ] Separate Crop Health region.
+- [ ] Healthy checkmark badge.
+- [ ] Decorative leaves at the bottom-right.
+Weather card
+- [ ] Current temperature of 29°C.
+- [ ] Partly cloudy illustration.
+- [ ] Humidity, wind, rain and min/max values.
+- [ ] Amber temperature chart.
+- [ ] Next-three-days forecast card.
+Irrigation card
+- [ ] Three horizontally arranged water metrics.
+- [ ] Blue droplet icons.
+- [ ] Vertical separators.
+- [ ] Green irrigation recommendation banner.
+- [ ] SVG soil moisture gauge.
+- [ ] 68% value.
+- [ ] Optimal label.
+Bottom cards
+- [ ] Soil image on the left.
+- [ ] Two soil information columns.
+- [ ] Three daily action items.
+- [ ] High, Medium, Low priority badges.
+- [ ] Full Action Plan button.
+- [ ] Red warning icon in Risks & Alerts.
+- [ ] Two individual risk entries.
+- [ ] Previous → Current → Next crop sequence.
+Visual styling
+- [ ] Dark forest-green background.
+- [ ] Foliage image behind the interface.
+- [ ] Translucent emerald surfaces.
+- [ ] Subtle green borders.
+- [ ] Soft background blur.
+- [ ] Bright green primary actions.
+- [ ] Amber warning elements.
+- [ ] Blue water indicators.
+- [ ] Consistent Inter typography.
+- [ ] Consistent rounded corners.
+- [ ] No white/light dashboard surfaces.
+- [ ] No unnecessary sidebar or navigation sections.
+
+21. Recommended implementation architecture
+For this particular page, I would use the following file organization:
+crop-dashboard/
+│
+├── index.html
+│
+├── css/
+│   ├── variables.css
+│   ├── global.css
+│   ├── background.css
+│   ├── breadcrumb.css
+│   ├── crop-hero.css
+│   ├── weather.css
+│   ├── irrigation.css
+│   ├── soil-information.css
+│   ├── action-plan.css
+│   ├── alerts.css
+│   ├── crop-rotation.css
+│   └── responsive.css
+│
+├── js/
+│   ├── app.js
+│   ├── crop-data.js
+│   ├── weather-chart.js
+│   ├── irrigation.js
+│   ├── soil.js
+│   ├── action-plan.js
+│   └── navigation.js
+│
+└── assets/
+    ├── backgrounds/
+    │   └── foliage.webp
+    │
+    ├── crops/
+    │   └── maize-field.webp
+    │
+    ├── soil/
+    │   └── loam-profile.webp
+    │
+    ├── decorations/
+    │   └── green-leaves.webp
+    │
+    └── icons/
+        ├── maize.svg
+        ├── plant.svg
+        ├── irrigation.svg
+        └── soil.svg
+
+
+
+22. The final design philosophy
+The most important thing to understand about this design is that it is not simply a collection of agricultural information cards.
+
+It is an individual crop intelligence workspace.
+
+Every section has a distinct purpose:
+Section	Question it answers
+Crop overview	What crop am I growing?
+Growth stage	How far has the crop developed?
+Crop lifecycle	When was it planted and when will it be harvested?
+Crop health	Is the crop progressing normally?
+Growing conditions	What environmental conditions is the crop experiencing?
+Water & Irrigation	How much water does the crop need?
+Soil information	What are the characteristics of the growing medium?
+Today's actions	What should I do today?
+Risks & Alerts	What could negatively affect the crop?
+Crop Rotation	What was planted before, and what comes next?
+
+The visual priority must always remain on the crop itself, followed by its current growing conditions and the actions required to maintain its health.
+
+The finished interface should feel like a premium agricultural intelligence platform: cinematic, information-rich, scientifically useful, and visually polished.
+
+One final implementation note: the original screenshot's exact font files, source photographs, SVG artwork, and CSS are not available, so the dimensions and styling values here are reconstruction targets estimated from the 1720 × 1204 reference, not recovered original source values.
