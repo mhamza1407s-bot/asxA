@@ -8,6 +8,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { createMapsRouter } from './server/mapsRouter';
 import { createMyFarmsRouter } from './server/myFarmsRouter';
+import { createQuestionnaireRouter } from './server/questionnaireRouter';
 
 dotenv.config();
 
@@ -959,6 +960,7 @@ app.get('/api/geocode/reverse', async (req, res) => {
 // Field Shift Maps & Geospatial Workspace backend routes
 app.use('/api/maps', createMapsRouter());
 app.use('/api/my-farms', createMyFarmsRouter());
+app.use('/api', createQuestionnaireRouter());
 
 const isProduction = process.env.NODE_ENV === 'production';
 const PORT = Number(process.env.PORT) || 3000;

@@ -16,6 +16,7 @@ import { About } from './pages/About';
 import { Maps } from './pages/Maps';
 import { MyFarms } from './pages/MyFarms';
 import { Rotation } from './pages/Rotation';
+import { Questions } from './pages/Questions';
 
 const AppShell: React.FC = () => {
   const location = useLocation();
@@ -91,6 +92,7 @@ const AppShell: React.FC = () => {
   const isMaps = location.pathname === '/maps';
   const isFarmDetail = location.pathname.startsWith('/my-farms/');
   const isRotation = location.pathname === '/rotation' || location.pathname.startsWith('/rotation/');
+  const isQuestions = location.pathname === '/questions' || location.pathname.startsWith('/questions/');
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-deep)] text-[var(--text-primary)]">
@@ -103,7 +105,7 @@ const AppShell: React.FC = () => {
       />
 
       <Header theme={theme} onToggleTheme={toggleTheme} overlay={true} />
-      {!isHome && !isRotation && <div aria-hidden="true" className="h-[80px] shrink-0" />}
+      {!isHome && !isRotation && !isQuestions && <div aria-hidden="true" className="h-[80px] shrink-0" />}
 
       <main className="flex-1 flex flex-col">
         <Routes>
@@ -112,6 +114,7 @@ const AppShell: React.FC = () => {
           <Route path="/my-farms" element={<MyFarms />} />
           <Route path="/my-farms/:farmId" element={<MyFarms />} />
           <Route path="/rotation" element={<Rotation />} />
+          <Route path="/questions" element={<Questions theme={theme} />} />
           <Route path="/maps" element={<Maps />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/data" element={<DataSources />} />
@@ -119,7 +122,7 @@ const AppShell: React.FC = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      {!isHome && !isMaps && !isFarmDetail && !isRotation && <Footer />}
+      {!isHome && !isMaps && !isFarmDetail && !isRotation && !isQuestions && <Footer />}
     </div>
   );
 };

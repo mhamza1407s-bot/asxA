@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowRight,
@@ -7,6 +8,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  ClipboardList,
   Clock,
   Download,
   FileText,
@@ -24,7 +26,16 @@ import {
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { ensureSyncedFarmProfiles } from '../lib/homeFarmEvaluator';
-import { getActiveFarmId, setActiveFarmId } from '../lib/farmStorage';
+import { getActiveFarmId, setActiveFarmId, upsertFarmProfile } from '../lib/farmStorage';
+import {
+  mapSnapshotToFarmProfile,
+  mapSnapshotToRotationDraft,
+} from '../lib/questionnaireEngine';
+import {
+  loadLocalSnapshotBundle,
+  saveLocalSnapshotBundle,
+} from '../lib/questionnaireStorage';
+import { fetchImmutableSnapshotApi } from '../services/questionnaireApi';
 import {
   buildAssessedFarmRecord,
   ServerRawFarmDto,
@@ -449,6 +460,9 @@ const PlanShowcaseBody: React.FC<PlanShowcaseBodyProps> = ({
 
 export const Rotation: React.FC = () => {
   const { showToast } = useToast();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const snapshotIdParam = searchParams.get('snapshotId');
 
   // Portfolio & farm selection state
   const [farms, setFarms] = useState<MyFarmRecord[]>(() => buildFallbackPortfolioFarms());
@@ -535,6 +549,53 @@ export const Rotation: React.FC = () => {
     }
     setDraft(loaded);
   }, [currentFarm?.id, fields.length]);
+
+  // Hydrate immutable snapshot handoff from /questions -> /rotation?snapshotId=...
+  useEffect(() => {
+    if (!snapshotIdParam) return;
+    let cancelled = false;
+    const applyBundle = (
+      snapshot: Parameters<typeof mapSnapshotToRotationDraft>[0],
+      result: Parameters<typeof mapSnapshotToRotationDraft>[1]
+    ) => {
+      if (cancelled) return;
+      const hydrated = mapSnapshotToRotationDraft(snapshot, result);
+      saveRotationDraft(hydrated);
+      upsertFarmProfile(mapSnapshotToFarmProfile(snapshot));
+      setActiveFarmId(snapshot.farmId);
+      setSelectedFarmId(snapshot.farmId);
+      if (snapshot.fieldId) {
+        setSelectedFieldId(snapshot.fieldId);
+      }
+      setDraft(hydrated);
+      loadPortfolio();
+      showToast(
+        `Loaded verified snapshot for ${snapshot.farmName} (${snapshot.evidenceCoverageGrade}).`,
+        'success'
+      );
+    };
+
+    const local = loadLocalSnapshotBundle(snapshotIdParam);
+    if (local) {
+      applyBundle(local.snapshot, local.result);
+    }
+
+    fetchImmutableSnapshotApi(snapshotIdParam)
+      .then((remote) => {
+        if (cancelled || !remote?.snapshot) return;
+        saveLocalSnapshotBundle(remote.snapshot, remote.result);
+        if (!local) {
+          applyBundle(remote.snapshot, remote.result);
+        }
+      })
+      .catch(() => {
+        // Local bundle already applied if present
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [snapshotIdParam, loadPortfolio, showToast]);
 
   const currentField = useMemo(
     () =>
@@ -1182,14 +1243,25 @@ export const Rotation: React.FC = () => {
               </div>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setWizardModal({ open: true, step: 0 })}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 dark:bg-[#05352E]/85 hover:bg-white dark:hover:bg-[#094D43] border border-[#0F766E]/35 dark:border-[#2DD4BF]/40 text-[11.5px] font-semibold text-[#072622] dark:text-white whitespace-nowrap shrink-0 cursor-pointer transition-colors"
-            >
-              <Pencil className="w-3.5 h-3.5 text-[#0F766E] dark:text-[#5EEAD4]" />
-              <span>Edit inputs</span>
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => navigate('/questions?mode=edit&new=1')}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/55 dark:bg-white/[0.08] hover:bg-white dark:hover:bg-white/[0.15] border border-[#0F766E]/25 dark:border-white/20 text-[11.5px] font-semibold text-[#072622] dark:text-[#D5F3ED] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+                title="Open guided field questionnaire"
+              >
+                <ClipboardList className="w-3.5 h-3.5 text-[#0F766E] dark:text-[#5EEAD4]" />
+                <span>Questions</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setWizardModal({ open: true, step: 0 })}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 dark:bg-[#05352E]/85 hover:bg-white dark:hover:bg-[#094D43] border border-[#0F766E]/35 dark:border-[#2DD4BF]/40 text-[11.5px] font-semibold text-[#072622] dark:text-white whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+              >
+                <Pencil className="w-3.5 h-3.5 text-[#0F766E] dark:text-[#5EEAD4]" />
+                <span>Edit inputs</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>

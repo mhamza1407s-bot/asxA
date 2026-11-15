@@ -238,6 +238,15 @@ export const FarmQuestionnaire: React.FC<FarmQuestionnaireProps> = ({
       }
     }
     if (stage === 2) {
+      if (
+        profile.soil.phStatus === 'tested' &&
+        (profile.soil.phValue === null ||
+          !Number.isFinite(profile.soil.phValue) ||
+          profile.soil.phValue < 0 ||
+          profile.soil.phValue > 14)
+      ) {
+        return 'Please enter your tested soil pH reading (0–14) or select "Not tested".';
+      }
       if (profile.soil.preparationMethods.includes('Other') && !profile.soil.preparationOther.trim()) {
         return 'Please specify your "Other" soil preparation method.';
       }
@@ -730,7 +739,7 @@ export const FarmQuestionnaire: React.FC<FarmQuestionnaireProps> = ({
                           soil: {
                             ...profile.soil,
                             phStatus: opt.id,
-                            phValue: opt.id === 'not_tested' ? null : profile.soil.phValue ?? 6.5,
+                            phValue: opt.id === 'not_tested' ? null : profile.soil.phValue ?? null,
                           },
                         })
                       }
@@ -747,28 +756,69 @@ export const FarmQuestionnaire: React.FC<FarmQuestionnaireProps> = ({
 
                 {profile.soil.phStatus === 'tested' && (
                   <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-[var(--text-secondary)]">Soil pH reading</span>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs gap-2">
+                        <label htmlFor="soil-ph-input" className="text-[var(--text-secondary)]">
+                          Soil pH reading
+                        </label>
                         <span className="font-mono font-semibold tabular-nums text-[var(--teal)]">
-                          pH {(profile.soil.phValue ?? 6.5).toFixed(1)}
+                          {profile.soil.phValue !== null
+                            ? `pH ${profile.soil.phValue.toFixed(1)}`
+                            : 'Not entered'}
                         </span>
                       </div>
-                      <input
-                        type="range"
-                        aria-label="Soil pH slider"
-                        min={0}
-                        max={14}
-                        step={0.1}
-                        value={profile.soil.phValue ?? 6.5}
-                        onChange={(e) =>
-                          onChange({
-                            ...profile,
-                            soil: { ...profile.soil, phValue: Number(e.target.value) },
-                          })
-                        }
-                        className="w-full accent-[var(--accent)] cursor-pointer"
-                      />
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <input
+                          id="soil-ph-input"
+                          type="number"
+                          min={0}
+                          max={14}
+                          step={0.1}
+                          value={profile.soil.phValue ?? ''}
+                          onChange={(e) => {
+                            const raw = e.target.value;
+                            if (raw === '') {
+                              onChange({
+                                ...profile,
+                                soil: { ...profile.soil, phValue: null },
+                              });
+                              return;
+                            }
+                            const parsed = Number(raw);
+                            if (Number.isFinite(parsed)) {
+                              onChange({
+                                ...profile,
+                                soil: {
+                                  ...profile.soil,
+                                  phValue: Math.max(0, Math.min(14, Number(parsed.toFixed(1)))),
+                                },
+                              });
+                            }
+                          }}
+                          placeholder="Enter pH (0–14)"
+                          className="w-full sm:w-44 min-h-[40px] px-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] text-xs font-mono tabular-nums text-[var(--text-primary)]"
+                        />
+                        <input
+                          type="range"
+                          aria-label="Soil pH slider"
+                          min={0}
+                          max={14}
+                          step={0.1}
+                          value={profile.soil.phValue ?? 0}
+                          onChange={(e) =>
+                            onChange({
+                              ...profile,
+                              soil: { ...profile.soil, phValue: Number(e.target.value) },
+                            })
+                          }
+                          className="flex-1 accent-[var(--accent)] cursor-pointer"
+                        />
+                      </div>
+                      {profile.soil.phValue === null && (
+                        <p className="text-[11px] text-[var(--text-secondary)]">
+                          No numeric reading stored yet — enter your tested soil pH (0–14) or adjust the slider to record one.
+                        </p>
+                      )}
                       <div className="flex justify-between text-[11px] font-mono tabular-nums text-[var(--text-secondary)]">
                         <span>0 (Acidic)</span>
                         <span>7.0 (Neutral)</span>

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   Bell,
+  ClipboardList,
   Database,
   Home,
   Info,
@@ -19,6 +20,10 @@ import { FieldShiftLogoLeaf } from './home/FieldShiftIcons';
 import { useDisplayPrefs } from '../context/DisplayPrefsContext';
 import { ensureSyncedFarmProfiles, HomeFarmAlert } from '../lib/homeFarmEvaluator';
 import { getActiveFarmId, setActiveFarmId } from '../lib/farmStorage';
+import {
+  hasActiveIncompleteQuestionnaireDraft,
+  QUESTIONNAIRE_CHANGED_EVENT,
+} from '../lib/questionnaireStorage';
 
 interface HeaderProps {
   theme: 'dark' | 'light';
@@ -62,16 +67,43 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, overlay = 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [selectedAlertModal, setSelectedAlertModal] = useState<HomeFarmAlert | null>(null);
   const [farmsSyncTick, setFarmsSyncTick] = useState(0);
+  const [hasIncompleteQuestions, setHasIncompleteQuestions] = useState(() =>
+    hasActiveIncompleteQuestionnaireDraft()
+  );
 
   useEffect(() => {
     const bump = () => setFarmsSyncTick((t) => t + 1);
+    const syncQuestions = () => setHasIncompleteQuestions(hasActiveIncompleteQuestionnaireDraft());
+    syncQuestions();
     window.addEventListener('anchor:farms-updated', bump);
+    window.addEventListener(QUESTIONNAIRE_CHANGED_EVENT, syncQuestions);
     window.addEventListener('storage', bump);
+    window.addEventListener('storage', syncQuestions);
     return () => {
       window.removeEventListener('anchor:farms-updated', bump);
+      window.removeEventListener(QUESTIONNAIRE_CHANGED_EVENT, syncQuestions);
       window.removeEventListener('storage', bump);
+      window.removeEventListener('storage', syncQuestions);
     };
   }, []);
+
+  useEffect(() => {
+    setHasIncompleteQuestions(hasActiveIncompleteQuestionnaireDraft());
+  }, [location.pathname]);
+
+  const navItems = useMemo(() => {
+    const base: Array<{ to: string; label: string; Icon: React.ComponentType<{ className?: string; strokeWidth?: number }> }> = [
+      ...NAV_ITEMS,
+    ];
+    if (hasIncompleteQuestions || location.pathname === '/questions' || location.pathname.startsWith('/questions/')) {
+      base.splice(1, 0, {
+        to: '/questions',
+        label: 'Questions',
+        Icon: ClipboardList,
+      });
+    }
+    return base;
+  }, [hasIncompleteQuestions, location.pathname]);
 
   const currentFarm = useMemo(() => {
     const farms = ensureSyncedFarmProfiles();
@@ -153,7 +185,7 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, overlay = 
                     }
               }
             >
-              {NAV_ITEMS.map(({ to, label, Icon }) => {
+              {navItems.map(({ to, label, Icon }) => {
                 const active =
                   to === '/'
                     ? location.pathname === '/'
@@ -705,6 +737,20 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, overlay = 
                   >
                     Open Smart Farm Workspace
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      navigate('/questions?mode=create&new=1');
+                    }}
+                    className={`w-full py-2 px-3 rounded-xl text-xs font-semibold border transition cursor-pointer ${
+                      isLight
+                        ? 'border-[#0F766E]/35 text-[#072622] hover:bg-white/60'
+                        : 'border-teal-400/30 text-[#D0ECE6] hover:bg-white/10'
+                    }`}
+                  >
+                    Guided Field Questionnaire
+                  </button>
                 </div>
               )}
             </div>
@@ -716,7 +762,7 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, overlay = 
               aria-label="Mobile navigation"
               className="lg:hidden relative z-30 pointer-events-auto mt-3 fs-glass-card rounded-[24px] p-3 grid grid-cols-2 sm:grid-cols-3 gap-2"
             >
-              {NAV_ITEMS.map(({ to, label, Icon }) => {
+              {navItems.map(({ to, label, Icon }) => {
                 const active =
                   to === '/'
                     ? location.pathname === '/'

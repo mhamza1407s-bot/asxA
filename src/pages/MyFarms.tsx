@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   AlertTriangle,
   ChevronDown,
+  ClipboardList,
   LayoutGrid,
   List,
   Plus,
@@ -751,6 +752,15 @@ export const MyFarms: React.FC = () => {
                 }
                 onDismissQuotaError={() => setQuotaError(null)}
               />
+
+              <button
+                type="button"
+                onClick={() => navigate('/questions?mode=create&new=1')}
+                className="h-[52px] px-5 rounded-full inline-flex items-center justify-center gap-2 bg-white/75 dark:bg-white/[0.08] text-[#072622] dark:text-[#ECF8F5] text-sm font-semibold border border-[#0F766E]/30 dark:border-white/20 hover:bg-white dark:hover:bg-white/[0.14] transition-all cursor-pointer"
+              >
+                <ClipboardList className="w-4 h-4 text-[#0F766E] dark:text-[#5EEAD4]" />
+                Guided Questionnaire
+              </button>
 
               <button
                 type="button"
